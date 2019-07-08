@@ -1,49 +1,92 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, TextInput, View, Button, AsyncStorage, Alert } from 'react-native';
+import {firebaseInit, authLogin, authSignUp, authDetect} from './firebase';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
-
-type Props = {};
-export default class App extends Component<Props> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-      </View>
+export default class App extends Component {
+  state = {
+    email: '',
+    password: '',
+  };
+  componentDidMount() {
+    firebaseInit();
+    AsyncStorage.getItem('userEmail').then(val => {
+      if (val) {
+        this.setState({ email: val });
+      }
+    });
+  }
+  onLoginPress = async () => {
+    if (!this.state.email || !this.state.password) {
+      Alert.alert("Error", "No email or password");
+      return;
+    }
+    authLogin(
+      this.state.email,
+      this.state.password, (x) => x,
+      (err) => alert(`Could not login :(`)
     );
+    authDetect(this.onLoginSuccess);
+    await AsyncStorage.setItem('userEmail', this.state.email);
+  }
+  onSignUpPress = async () => {
+    if (!this.state.email || !this.state.password) {
+      Alert.alert("Error", "No email or password");
+      return;
+    }
+    authSignUp(
+      this.state.email,
+      this.state.password, this.onLoginSuccess,
+      (err) => alert(`Could not sign up with ${this.state.email}`)
+    );
+    await AsyncStorage.setItem('userEmail', this.state.email);
+  }
+
+  onLoginSuccess = () => {
+    alert("Successfully logged in!!!");
+  }
+
+  onSignUpPress = () => {
+    alert("Successfully signed up!!!");
+  }
+  handleChange = key => val => {
+    this.setState({ [key]: val });
+  };
+  render() {
+  return (
+    <View style={styles.container}>
+      <TextInput
+          placeholder="Email"
+          style={styles.input}
+          value={this.state.email}
+          onChangeText={this.handleChange('email')}
+          keyboardType="email-address"
+        />
+        <TextInput
+          placeholder="Password"
+          style={styles.input}
+          value={this.state.password}
+          onChangeText={this.handleChange('password')}
+        />
+      <Button onPress={this.onLoginPress} title="Login" />
+      <Button onPress={this.onSignUpPress} title="Sign up" />
+    </View>
+  );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: 'center',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    width: '90%',
+    padding: 10,
+    marginTop: 5,
     marginBottom: 5,
-  },
+  }
 });
