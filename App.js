@@ -7,8 +7,9 @@ import { ApplicationProvider, Layout } from 'react-native-ui-kitten';
 import LoginScreen from './screens/LoginScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import LoadingScreen from './screens/LoadingScreen';
+import TodoList from './screens/TodoList';
 
-firebaseInit();
+// firebaseInit();
 
 export default class App extends Component {
   render() {
@@ -17,7 +18,8 @@ export default class App extends Component {
       mapping={mapping}
       theme={lightTheme}>
         {/* <Layout style={{flex: 1}}/> */}
-        <AppNavigator />
+        {/* <AppNavigator /> */}
+        <TodoList />
       </ApplicationProvider>
     );
   }

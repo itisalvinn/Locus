@@ -3,6 +3,7 @@
  */
 import * as firebase from 'firebase';
 import Expo, { AuthSession } from 'expo';
+import Rebase from 're-base';
 
 /**
  * Initialize a Firebase instance
@@ -20,6 +21,14 @@ export const firebaseInit = () => {
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 }
+
+export const app = firebase.initializeApp({
+	apiKey: "AIzaSyBGt-n0ZOdbVfph7nwrzzx5Yth7uJR4eHI",
+	authDomain: "locus-d80a9.firebaseapp.com",
+	databaseURL: "https://locus-d80a9.firebaseio.com"
+});
+
+export const base = Rebase.createClass(app.database());
 
 /**
  * Set Firebase's authentication persistence
