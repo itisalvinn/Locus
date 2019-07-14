@@ -11,11 +11,13 @@ class LoadingScreen extends Component {
   checkIfLoggedIn = () => {
     authDetect( (user) => {
       if (user) {
-        this.props.navigation.navigate('DashBoardScreen');
+        return this.props.navigation.navigate('DashBoardScreen');
       }else {
-        this.props.navigation.navigate('LoginScreen')
+        return this.props.navigation.navigate('LoginScreen');
       }
     });
+
+    return this.props.navigation.navigate('LoginScreen');
   }
 
   render() {
