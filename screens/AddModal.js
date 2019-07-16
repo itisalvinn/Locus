@@ -56,7 +56,7 @@ export default class AddModal extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f7f9fc',
+    backgroundColor: '#fff',
     position: 'absolute',
     bottom: 0,
     left: 0, 
