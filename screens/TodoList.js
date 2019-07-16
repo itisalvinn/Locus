@@ -63,7 +63,6 @@ export default class TodoList extends React.Component {
         [item]: !checkedItem
       }
     });
-    // this.updateState(this.state.uid);
   }
 
   onAddPress = () => {
@@ -74,9 +73,11 @@ export default class TodoList extends React.Component {
   }
 
   addItem = (item) => {
-    alert(`Add item: ${item}`);
+    const {data, dataKeys} = this.state;
     this.setState({
-      addClicked: false
+      addClicked: false,
+      data: {...data, [item]: false},
+      dataKeys: [...dataKeys, item]
     });
   }
 
