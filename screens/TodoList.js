@@ -83,12 +83,13 @@ export default class TodoList extends React.Component {
 
   renderItem = (info) => {
     const checkedItem = this.state.data[info.item];
+    const lastItem = info.item === this.state.dataKeys[this.state.dataKeys.length - 1];
     return (
       <CheckBox
         checked={checkedItem}
         text={info.item}
         textStyle={checkedItem ? styles.checkedText : styles.radioText}
-        style={styles.listItem}
+        style={lastItem ? styles.lastListItem : styles.listItem}
         onChange={(checked) => this.onChange(checked, info.item)}
       />
     );
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(218,224,235,.6)'
+    backgroundColor: 'rgba(218,224,235,.6)',
   },
   container: {
     flex: 1,
@@ -143,13 +144,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     backgroundColor: '#ffffff',
   },
+  lastListItem: {
+    padding: 20,
+    borderBottomColor: '#f4f4f6',
+    borderBottomWidth: 1,
+    backgroundColor: '#ffffff',
+    marginBottom: 80,
+  },
   listItemTitle: {
     fontSize: 16
   },
   listContainer: {
     width: "100%",
     backgroundColor: '#ffffff',
-    paddingBottom: 100,
   },
   checkedText: {
     color: "#c6cee0"
@@ -163,8 +170,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
-    paddingBottom: 20,
-    paddingRight: 20,
+    width: 100,
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
   },
   addBtn: {
     alignItems: 'center',
