@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
-    paddingBottom: 30,
+    paddingBottom: 20,
     paddingRight: 20,
   },
   addBtn: {
