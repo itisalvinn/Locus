@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { StyleSheet, AsyncStorage} from 'react-native';
+import { StyleSheet, AsyncStorage, View} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
 import {authDetect, base} from '../firebase';
-import * as firebase from 'firebase';
+import AddModal from './AddModal';
 
 export default class TodoList extends React.Component {
   state = {
     data: {},
     dataKeys: [],
-    uid: null
+    uid: null,
+    addClicked: false,
   }
 
   componentDidMount() {
@@ -65,6 +66,20 @@ export default class TodoList extends React.Component {
     // this.updateState(this.state.uid);
   }
 
+  onAddPress = () => {
+    const {addClicked} = this.state;
+    this.setState({
+      addClicked: !addClicked
+    });
+  }
+
+  addItem = (item) => {
+    alert(`Add item: ${item}`);
+    this.setState({
+      addClicked: false
+    });
+  }
+
   renderItem = (info) => {
     const checkedItem = this.state.data[info.item];
     return (
@@ -86,12 +101,33 @@ export default class TodoList extends React.Component {
   renderItem={this.renderItem}
   style={styles.listContainer}
 />
+<View style={styles.btnWrapper}>
+<Button
+style={styles.addBtn}
+textStyle={styles.btnText}
+onPress={this.onAddPress}>
+  Add
+  </Button>
+</View>
+<AddModal
+visible={this.state.addClicked}
+onClose={this.onAddPress}
+addItem={this.addItem} />
+{this.state.addClicked ? <View style={styles.overlay} />: null}
   </Layout>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, .3)'
+  },
   container: {
     flex: 1,
     // alignItems: 'center',
@@ -112,11 +148,29 @@ const styles = StyleSheet.create({
   listContainer: {
     width: "100%",
     backgroundColor: '#ffffff',
+    paddingBottom: 100,
   },
   checkedText: {
     color: "#c6cee0"
   },
   radioText: {
     color: '#394159'
+  },
+  btnWrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    paddingBottom: 30,
+    paddingRight: 20,
+  },
+  addBtn: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  btnText: {
+    fontSize: 15,
+    fontWeight: '500'
   }
 });
