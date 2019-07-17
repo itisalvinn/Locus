@@ -3,11 +3,12 @@ import { StyleSheet, AsyncStorage, View} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
 import {authDetect, base} from '../firebase';
 import AddModal from './AddModal';
+import { Swipeable } from 'expo';
 
 export default class TodoList extends React.Component {
   state = {
-    data: {},
-    dataKeys: [],
+    items: {},
+    itemKeys: [],
     uid: null,
     addClicked: false,
   }
@@ -40,29 +41,25 @@ export default class TodoList extends React.Component {
   }
 
   synchronizeStatesWithFirebase(uid) {
-    this.dataRef = base.syncState(`todo_list/${uid}/data`, {
+    this.itemsRef = base.syncState(`todo_list/${uid}/items`, {
       context: this,
-      state: "data"
+      state: "items"
     });
-    this.dataKeysRef = base.syncState(`todo_list/${uid}/dataKeys`, {
+    this.itemKeys = base.syncState(`todo_list/${uid}/itemKeys`, {
       context: this,
-      state: "dataKeys"
+      state: "itemKeys"
     });
   }
 
   removeBindingFromFirebase() {
-    base.removeBinding(this.dataRef);
-    base.removeBinding(this.dataKeysRef);
+    base.removeBinding(this.itemsRef);
+    base.removeBinding(this.itemKeys);
   }
 
-  onChange(checked, item) {
-    const checkedItem = this.state.data[item];
-    this.setState({
-      data: {
-        ...this.state.data,
-        [item]: !checkedItem
-      }
-    });
+  toggleItemComplete(key) {
+    const {items} = this.state;
+    items[key].completed = !items[key].completed;
+    this.setState({ items });
   }
 
   onAddPress = () => {
@@ -72,25 +69,40 @@ export default class TodoList extends React.Component {
     });
   }
 
-  addItem = (item) => {
-    const {data, dataKeys} = this.state;
+  addItem = (key) => {
+    const {items} = this.state;
+    const timestamp = Date.now();
+
+    items[`item-${timestamp}`] = {
+      title: key,
+      completed: false,
+      timestamp,
+    };
+
+    let itemKeys = Object.keys(items).reduce((acc, cur) => {
+      return [...acc, {title: cur, timestamp: items[cur].timestamp}];
+    }, []);
+    itemKeys.sort((a, b) => b.timestamp - a.timestamp);
+    itemKeys = itemKeys.map(item => item.title);
+
     this.setState({
       addClicked: false,
-      data: {...data, [item]: false},
-      dataKeys: [...dataKeys, item]
+      items,
+      itemKeys,
     });
   }
 
   renderItem = (info) => {
-    const checkedItem = this.state.data[info.item];
-    const lastItem = info.item === this.state.dataKeys[this.state.dataKeys.length - 1];
+    if (!this.state.itemKeys || !this.state.itemKeys.length) return null;
+    const checkedItem = this.state.items[info.item];
+    const lastItem = info.item === this.state.itemKeys[this.state.itemKeys.length - 1];
     return (
       <CheckBox
-        checked={checkedItem}
-        text={info.item}
-        textStyle={checkedItem ? styles.checkedText : styles.radioText}
+        checked={checkedItem.completed}
+        text={checkedItem.title}
+        textStyle={checkedItem.completed ? styles.checkedText : styles.radioText}
         style={lastItem ? styles.lastListItem : styles.listItem}
-        onChange={(checked) => this.onChange(checked, info.item)}
+        onChange={(checked) => this.toggleItemComplete(info.item)}
       />
     );
   };
@@ -98,11 +110,28 @@ export default class TodoList extends React.Component {
     return (
   <Layout style={styles.container}>
     <Text style={styles.text} category='h5'>Todo List</Text>
+
+
     <List
-  data={this.state.dataKeys}
+  data={this.state.itemKeys && this.state.itemKeys.length ? this.state.itemKeys : []}
   renderItem={this.renderItem}
   style={styles.listContainer}
 />
+
+{/* <SwipeListView
+  data={this.state.dataKeys}
+  renderItem={this.renderItem}
+  renderHiddenItem={(data, rowMap) => (
+    <View style={styles.rowBack}>
+      <Text>Left</Text>
+      <Text>Right</Text>
+    </View>
+  )}
+  leftOpenValue={0}
+  rightOpenValue={-75}
+  disableRightSwipe={true}
+/> */}
+
 <View style={styles.btnWrapper}>
 <Button
 style={styles.addBtn}
@@ -182,5 +211,13 @@ const styles = StyleSheet.create({
   btnText: {
     fontSize: 15,
     fontWeight: '500'
-  }
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#DDD',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 15,
+  },
 });
