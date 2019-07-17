@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { StyleSheet, AsyncStorage, View} from 'react-native';
+import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
 import {authDetect, base} from '../firebase';
 import AddModal from './AddModal';
-import { Swipeable } from 'expo';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { Ionicons } from '@expo/vector-icons';
 
 export default class TodoList extends React.Component {
   state = {
@@ -12,6 +13,8 @@ export default class TodoList extends React.Component {
     uid: null,
     addClicked: false,
   }
+
+  rows = {};
 
   componentDidMount() {
     AsyncStorage.getItem('uid').then(val => {
@@ -45,7 +48,7 @@ export default class TodoList extends React.Component {
       context: this,
       state: "items"
     });
-    this.itemKeys = base.syncState(`todo_list/${uid}/itemKeys`, {
+    this.itemKeysRef = base.syncState(`todo_list/${uid}/itemKeys`, {
       context: this,
       state: "itemKeys"
     });
@@ -53,7 +56,7 @@ export default class TodoList extends React.Component {
 
   removeBindingFromFirebase() {
     base.removeBinding(this.itemsRef);
-    base.removeBinding(this.itemKeys);
+    base.removeBinding(this.itemKeysRef);
   }
 
   toggleItemComplete(key) {
@@ -92,20 +95,50 @@ export default class TodoList extends React.Component {
     });
   }
 
+  deleteItem = (key) => {
+    const {items} = this.state;
+    let {itemKeys} = this.state;
+
+    items[key] = null;
+
+    itemKeys = itemKeys.filter(item => item != key);
+    
+    this.setState({
+      addClicked: false,
+      items,
+      itemKeys,
+    });
+
+    this.rows[key].close();
+  }
+
+  swipeRightAction = (key) => {
+    return (
+      <TouchableOpacity style={styles.iconBtnContainer} onPress={() => this.deleteItem(key)}>
+        <Ionicons name="ios-trash" size={32} color="#ffffff" />
+      </TouchableOpacity>
+    );
+  }
+
   renderItem = (info) => {
     if (!this.state.itemKeys || !this.state.itemKeys.length) return null;
     const checkedItem = this.state.items[info.item];
     const lastItem = info.item === this.state.itemKeys[this.state.itemKeys.length - 1];
     return (
-      <CheckBox
+      <Swipeable
+      ref={(row) => this.rows[info.item] = row}
+      renderRightActions={() => this.swipeRightAction(info.item)}>
+        <CheckBox
         checked={checkedItem.completed}
         text={checkedItem.title}
         textStyle={checkedItem.completed ? styles.checkedText : styles.radioText}
         style={lastItem ? styles.lastListItem : styles.listItem}
         onChange={(checked) => this.toggleItemComplete(info.item)}
       />
+      </Swipeable>
     );
   };
+
   render() {
     return (
   <Layout style={styles.container}>
@@ -117,20 +150,6 @@ export default class TodoList extends React.Component {
   renderItem={this.renderItem}
   style={styles.listContainer}
 />
-
-{/* <SwipeListView
-  data={this.state.dataKeys}
-  renderItem={this.renderItem}
-  renderHiddenItem={(data, rowMap) => (
-    <View style={styles.rowBack}>
-      <Text>Left</Text>
-      <Text>Right</Text>
-    </View>
-  )}
-  leftOpenValue={0}
-  rightOpenValue={-75}
-  disableRightSwipe={true}
-/> */}
 
 <View style={styles.btnWrapper}>
 <Button
@@ -172,6 +191,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f4f4f6',
     borderBottomWidth: 1,
     backgroundColor: '#ffffff',
+    height: 70,
   },
   lastListItem: {
     padding: 20,
@@ -179,6 +199,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     backgroundColor: '#ffffff',
     marginBottom: 80,
+    height: 70,
   },
   listItemTitle: {
     fontSize: 16
@@ -220,4 +241,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingLeft: 15,
   },
+  iconBtnContainer: {
+    backgroundColor: 'red',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 70,
+    height: 70,
+  }
 });
