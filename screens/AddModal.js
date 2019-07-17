@@ -43,7 +43,7 @@ export default class AddModal extends React.Component {
         <Button
         style={styles.addBtn}
         onPress={() => this.addItem(this.state.inputVal)}
-        size='small' appearance='outline'
+        size='medium' appearance='outline'
         disabled={!this.state.inputVal || !this.state.inputVal.length}>
           Add Item
           </Button>

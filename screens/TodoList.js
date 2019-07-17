@@ -4,6 +4,7 @@ import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBo
 import {authDetect, base} from '../firebase';
 import AddModal from './AddModal';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { RectButton } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 
 export default class TodoList extends React.Component {
@@ -114,9 +115,9 @@ export default class TodoList extends React.Component {
 
   swipeRightAction = (key) => {
     return (
-      <TouchableOpacity style={styles.iconBtnContainer} onPress={() => this.deleteItem(key)}>
+      <RectButton style={styles.iconBtnContainer} onPress={() => this.deleteItem(key)}>
         <Ionicons name="ios-trash" size={32} color="#ffffff" />
-      </TouchableOpacity>
+      </RectButton>
     );
   }
 
