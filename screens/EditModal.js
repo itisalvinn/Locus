@@ -4,16 +4,25 @@ import { Layout, Text, Button, Input} from 'react-native-ui-kitten';
 import {authDetect, base} from '../firebase';
 
 
-export default class AddModal extends React.Component {
-  state = {inputVal: ''}
+export default class EditModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      inputVal: props.text || ''
+    };
+  }
+
+  componentDidMount() {
+    this.input.focus();
+  }
 
   onInputValueChange = (inputVal) => {
     this.setState({inputVal});
   }
 
-  addItem = (inputVal) => {
+  onSubmit = (inputVal) => {
     this.setState({inputVal: ''});
-    this.props.addItem(inputVal);
+    this.props.onSubmit(inputVal);
   }
 
   onClose = () => {
@@ -22,11 +31,10 @@ export default class AddModal extends React.Component {
   }
 
   render() {
-  if (!this.props.visible) return null;
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
       <View style={styles.header}>
-        <Text category='s1' style={styles.txt}>Add Item</Text>
+        <Text category='s1' style={styles.txt}>{this.props.title}</Text>
         <Button
         style={styles.btn}
         onPress={this.onClose}
@@ -39,13 +47,15 @@ export default class AddModal extends React.Component {
         onChangeText={this.onInputValueChange}
         placeholder='Item name...'
         style={styles.input}
+        ref={(input) => this.input = input}
+        autoFocus={true}
       />
         <Button
         style={styles.addBtn}
-        onPress={() => this.addItem(this.state.inputVal)}
+        onPress={() => this.onSubmit(this.state.inputVal)}
         size='medium' appearance='outline'
         disabled={!this.state.inputVal || !this.state.inputVal.length}>
-          Add Item
+          {this.props.btnText}
           </Button>
       
       </View>

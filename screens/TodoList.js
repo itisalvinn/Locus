@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
 import {authDetect, base} from '../firebase';
-import AddModal from './AddModal';
+import EditModal from './EditModal';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ export default class TodoList extends React.Component {
     itemKeys: [],
     uid: null,
     addClicked: false,
+    editClicked: false,
+    editItemKey: null,
   }
 
   rows = {};
@@ -73,6 +75,21 @@ export default class TodoList extends React.Component {
     });
   }
 
+  onCloseModalPress = () => {
+    this.setState({
+      addClicked: false,
+      editClicked: false,
+      editItemKey: null,
+    });
+  }
+
+  onEditPress = (key) => {
+    this.setState({
+      editClicked: true,
+      editItemKey: key,
+    });
+  }
+
   addItem = (key) => {
     const {items} = this.state;
     const timestamp = Date.now();
@@ -91,8 +108,19 @@ export default class TodoList extends React.Component {
 
     this.setState({
       addClicked: false,
+      editClicked: false,
       items,
       itemKeys,
+    });
+  }
+
+  editItem = (newTitle) => {
+    const {items, editItemKey} = this.state;
+    items[editItemKey].title = newTitle;
+    this.setState({
+      addClicked: false,
+      editClicked: false,
+      items,
     });
   }
 
@@ -106,6 +134,7 @@ export default class TodoList extends React.Component {
     
     this.setState({
       addClicked: false,
+      editClicked: false,
       items,
       itemKeys,
     });
@@ -129,23 +158,59 @@ export default class TodoList extends React.Component {
       <Swipeable
       ref={(row) => this.rows[info.item] = row}
       renderRightActions={() => this.swipeRightAction(info.item)}>
+        <View style={[styles.listItem, lastItem ? styles.lastListItem : null]}>
         <CheckBox
-        checked={checkedItem.completed}
-        text={checkedItem.title}
-        textStyle={checkedItem.completed ? styles.checkedText : styles.radioText}
-        style={lastItem ? styles.lastListItem : styles.listItem}
-        onChange={(checked) => this.toggleItemComplete(info.item)}
-      />
+          checked={checkedItem.completed}
+          style={styles.checkbx}
+          onChange={(checked) => this.toggleItemComplete(info.item)}
+        />
+        <TouchableOpacity style={styles.todoRow} onPress={() => this.onEditPress(info.item)}>
+          <Text style={[styles.rowText, checkedItem.completed ? styles.checkedText : styles.radioText]}>{checkedItem.title}</Text>
+        </TouchableOpacity>
+      </View>
       </Swipeable>
     );
   };
 
+  renderEditModal() {
+    if (this.state.addClicked) {
+      return (
+        <EditModal
+          title={'Add Item'}
+          btnText={'Add Item'}
+          onClose={this.onCloseModalPress}
+          onSubmit={this.addItem} />
+      );
+    } else if (this.state.editClicked) {
+      return (
+        <EditModal
+          title={'Edit Item'}
+          btnText={'Edit Item'}
+          onClose={this.onCloseModalPress}
+          onSubmit={this.editItem}
+          text={this.state.items[this.state.editItemKey].title} />
+      );
+    }
+    return null;
+  }
+
   render() {
     return (
   <Layout style={styles.container}>
-    <Text style={styles.text} category='h5'>Todo List</Text>
+    <Layout style={styles.header}>
+      <Text style={styles.text} category='h5'>Todo List</Text>
+      <View style={styles.editBtnWrapper}>
+        {/* <Button
+        style={styles.editBtn}
+        textStyle={styles.btnText}
+        onPress={this.onEditPress}
+        appearance='ghost'>
+          Filter
+        </Button> */}
+      </View>
+    </Layout>
 
-
+<Layout style={styles.content}>
     <List
   data={this.state.itemKeys && this.state.itemKeys.length ? this.state.itemKeys : []}
   renderItem={this.renderItem}
@@ -160,11 +225,12 @@ onPress={this.onAddPress}>
   Add
   </Button>
 </View>
-<AddModal
-visible={this.state.addClicked}
-onClose={this.onAddPress}
-addItem={this.addItem} />
-{this.state.addClicked ? <View style={styles.overlay} />: null}
+  </Layout>
+
+{this.renderEditModal()}
+{this.state.addClicked || this.state.editClicked ? (
+  <View style={styles.overlay} />
+): null}
   </Layout>
     );
   }
@@ -180,27 +246,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(218,224,235,.6)',
   },
   container: {
+    // height: '100%',
     flex: 1,
-    // alignItems: 'center',
+  },
+  content: {
+    flex: 1,
   },
   text: {
-    marginTop: 20,
     padding: 20,
+    flex: 1,
   },
   listItem: {
-    padding: 20,
     borderBottomColor: '#f4f4f6',
     borderBottomWidth: 1,
     backgroundColor: '#ffffff',
     height: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
   },
   lastListItem: {
-    padding: 20,
-    borderBottomColor: '#f4f4f6',
-    borderBottomWidth: 1,
-    backgroundColor: '#ffffff',
     marginBottom: 80,
-    height: 70,
+  },
+  checkbx: {
+    width: 30,
+    padding: 20,
   },
   listItemTitle: {
     fontSize: 16
@@ -208,6 +278,14 @@ const styles = StyleSheet.create({
   listContainer: {
     width: "100%",
     backgroundColor: '#ffffff',
+  },
+  todoRow: {
+    flex: 1,
+    padding: 20,
+    paddingLeft: 10,
+  },
+  rowText: {
+    fontWeight: '500',
   },
   checkedText: {
     color: "#c6cee0"
@@ -226,21 +304,20 @@ const styles = StyleSheet.create({
     right: 20,
     bottom: 20,
   },
+  editBtnWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
   addBtn: {
     alignItems: 'center',
     justifyContent: 'center'
   },
+  editBtn: {
+    marginRight: 10,
+  },
   btnText: {
     fontSize: 15,
     fontWeight: '500'
-  },
-  rowBack: {
-    alignItems: 'center',
-    backgroundColor: '#DDD',
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 15,
   },
   iconBtnContainer: {
     backgroundColor: 'red',
@@ -248,5 +325,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 70,
     height: 70,
-  }
+  },
+  header: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    paddingTop: 20,
+  },
 });
