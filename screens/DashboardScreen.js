@@ -41,7 +41,7 @@ class DashboardScreen extends Component {
     base.removeBinding(this.itemKeysRef);
   }
 
-  toggleItemComplete(key) {
+  toggleItemComplete = (key) => {
     const {items} = this.state;
     items[key].completed = !items[key].completed;
     this.setState({ items });
