@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator} from 'react-native';
-import { BottomNavigation, BottomNavigationTab } from 'react-native-ui-kitten';
+import {BottomNavigation, BottomNavigationTab} from 'react-native-ui-kitten';
 import TodoList from './TodoList/TodoList';
 import {authDetect, base, authSignOut} from '../firebase';
 
@@ -46,7 +46,7 @@ class DashboardScreen extends Component {
   toggleItemComplete = (key) => {
     const {items} = this.state;
     items[key].completed = !items[key].completed;
-    this.setState({ items });
+    this.setState({items});
   }
 
   addItem = (key) => {
@@ -86,7 +86,7 @@ class DashboardScreen extends Component {
     items[key] = null;
 
     itemKeys = itemKeys.filter(item => item != key);
-    
+
     this.setState({
       items,
       itemKeys,
@@ -98,7 +98,7 @@ class DashboardScreen extends Component {
   }
 
   onError = () => {
-    alert("Something went wrong. Logging out.");
+    alert("Something went wrong logging out.");
   }
 
   onSelect = (selectedIndex) => {
@@ -111,14 +111,25 @@ class DashboardScreen extends Component {
     if (selectedIndex === 1) {
       return (
         <TodoList
-            key='1'
-            items={this.state.items}
-            itemKeys={this.state.itemKeys}
-            deleteItem={this.deleteItem}
-            editItem={this.editItem}
-            addItem={this.addItem}
-            toggleItemComplete={this.toggleItemComplete}
-          />
+          key='1'
+          items={this.state.items}
+          itemKeys={this.state.itemKeys}
+          deleteItem={this.deleteItem}
+          editItem={this.editItem}
+          addItem={this.addItem}
+          toggleItemComplete={this.toggleItemComplete}
+        />
+      );
+    } else {
+      return (
+        <Button
+          key='3'
+          title="Log out"
+          onPress={() => authSignOut(this.onSuccess, this.onError)}
+          style={styles.logoutBtn}
+        >
+          Log Out
+        </Button>
       );
     }
   }
@@ -127,7 +138,7 @@ class DashboardScreen extends Component {
     if (!this.state.uid || !this.itemsRef || !this.itemKeysRef) {
       return (
         <View style={styles.container}>
-          <ActivityIndicator size={"large"} />
+          <ActivityIndicator size={"large"}/>
         </View>
       )
     }
@@ -136,13 +147,14 @@ class DashboardScreen extends Component {
         <View style={styles.content}>
           {this.renderSelectedPage()}
         </View>
+
         <View
           key='2'
           style={styles.bottomNav}>
           <BottomNavigation
             indicatorStyle={styles.indicator}
-            selectedIndex = {this.state.selectedIndex}
-            onSelect = {this.onSelect}>
+            selectedIndex={this.state.selectedIndex}
+            onSelect={this.onSelect}>
             <BottomNavigationTab title='Home'/>
             <BottomNavigationTab title='To Do List'/>
             <BottomNavigationTab title='Grocery List'/>
@@ -150,15 +162,6 @@ class DashboardScreen extends Component {
           </BottomNavigation>
         </View>
       </View>
-    //   <Button
-    //     key='3'
-    //     title="Log out"
-    //     onPress={ () => authSignOut(this.onSuccess, this.onError)}
-    //     style={styles.logoutBtn}
-    //   >
-    //   Log Out
-    // </Button>
-    // ]
     )
   }
 }
@@ -174,6 +177,7 @@ const styles = StyleSheet.create({
   logoutBtn: {
     position: 'absolute',
     bottom: 20,
+    top: 500,
     left: 0,
   },
   bottomNav: {

@@ -95,7 +95,23 @@ export const authLogin = (email, password, onSuccess, onError) =>
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(onSuccess)
+      .then((result) => {
+        // Returned result api
+        // https://firebase.google.com/docs/reference/js/firebase.auth.html#usercredential
+        console.log('Successfully logged in.');
+        // console.log(result);
+
+        firebase
+          .database()
+          .ref('/users/' + result.user.uid)
+          .update({
+            last_logged_in: Date.now()
+          })
+          .then(function (snapshot) {
+            console.log('Updated last_logged_in time');
+          });
+        onSuccess()
+      })
       .catch(onError)
   );
 
