@@ -41,19 +41,15 @@ export default class TodoList extends React.Component {
     });
   }
 
-  unswipeRows() {
-    Object.keys(this.rows).forEach(row => {
-      this.rows[row].close();
-    });
-  }
-
   addItem = (key) => {
     this.setState({
       addClicked: false,
       editClicked: false,
     });
     this.props.addItem(key);
-    this.unswipeRows();
+    Object.keys(this.rows).forEach(row => {
+      this.rows[row].close();
+    });
   }
 
   editItem = (newTitle) => {
@@ -129,42 +125,42 @@ export default class TodoList extends React.Component {
 
   render() {
     return (
-  <Layout style={styles.container}>
-    <Layout style={styles.header}>
-      <Text style={styles.text} category='h5'>Todo List</Text>
-      <View style={styles.editBtnWrapper}>
-        {/* <Button
-        style={styles.editBtn}
-        textStyle={styles.btnText}
-        onPress={this.onEditPress}
-        appearance='ghost'>
-          Filter
-        </Button> */}
-      </View>
+    <Layout style={styles.container}>
+      <Layout style={styles.header}>
+        <Text style={styles.text} category='h5'>Todo List</Text>
+        <View style={styles.editBtnWrapper}>
+          {/* <Button
+          style={styles.editBtn}
+          textStyle={styles.btnText}
+          onPress={this.onEditPress}
+          appearance='ghost'>
+            Filter
+          </Button> */}
+        </View>
+      </Layout>
+
+      <Layout style={styles.content}>
+        <List
+          data={this.props.itemKeys && this.props.itemKeys.length ? this.props.itemKeys : []}
+          renderItem={this.renderItem}
+          style={styles.listContainer}
+        />
+
+        <View style={styles.btnWrapper}>
+          <Button
+            style={styles.addBtn}
+            textStyle={styles.btnText}
+            onPress={this.onAddPress}>
+          Add
+          </Button>
+        </View>
+      </Layout>
+
+      {this.renderEditModal()}
+      {this.state.addClicked || this.state.editClicked ? (
+        <View style={styles.overlay} />
+      ): null}
     </Layout>
-
-<Layout style={styles.content}>
-    <List
-  data={this.props.itemKeys && this.props.itemKeys.length ? this.props.itemKeys : []}
-  renderItem={this.renderItem}
-  style={styles.listContainer}
-/>
-
-<View style={styles.btnWrapper}>
-<Button
-style={styles.addBtn}
-textStyle={styles.btnText}
-onPress={this.onAddPress}>
-  Add
-  </Button>
-</View>
-  </Layout>
-
-{this.renderEditModal()}
-{this.state.addClicked || this.state.editClicked ? (
-  <View style={styles.overlay} />
-): null}
-  </Layout>
     );
   }
 }
