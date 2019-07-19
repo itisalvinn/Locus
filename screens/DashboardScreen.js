@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator} from 'react-native';
-import TodoList from './TodoList';
+import TodoList from './TodoList/TodoList';
 import {authDetect, base, authSignOut} from '../firebase';
 
 
@@ -69,8 +69,8 @@ class DashboardScreen extends Component {
     });
   }
 
-  editItem = (newTitle) => {
-    const {items, editItemKey} = this.state;
+  editItem = (newTitle, editItemKey) => {
+    const {items} = this.state;
     items[editItemKey].title = newTitle;
     this.setState({
       items,

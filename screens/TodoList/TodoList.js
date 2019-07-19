@@ -15,53 +15,7 @@ export default class TodoList extends React.Component {
 
   rows = {};
 
-  componentDidMount() {
-  //   AsyncStorage.getItem('uid').then(val => {
-  //     if (!val) {
-  //       authDetect(async (user) => {
-  //           if (user) {
-  //             // User is signed in
-  //             const uid = user.uid;
-  //             await AsyncStorage.setItem('uid', uid);
-  //             this.setState({uid});
-  //             this.synchronizeStatesWithFirebase(uid);
-  //           } else {
-  //             // User is signed out
-  //             alert("not logged in");
-  //           }
-  //         }
-  //       );
-  //     } else {
-  //       this.setState({uid: val});
-  //       this.synchronizeStatesWithFirebase(val);
-  //     }
-  // });
-  }
-
-  // componentWillUnmount() {
-  //   this.removeBindingFromFirebase()
-  // }
-
-  // synchronizeStatesWithFirebase(uid) {
-  //   this.itemsRef = base.syncState(`todo_list/${uid}/items`, {
-  //     context: this,
-  //     state: "items"
-  //   });
-  //   this.itemKeysRef = base.syncState(`todo_list/${uid}/itemKeys`, {
-  //     context: this,
-  //     state: "itemKeys"
-  //   });
-  // }
-
-  // removeBindingFromFirebase() {
-  //   base.removeBinding(this.itemsRef);
-  //   base.removeBinding(this.itemKeysRef);
-  // }
-
   toggleItemComplete(key) {
-    // const {items} = this.state;
-    // items[key].completed = !items[key].completed;
-    // this.setState({ items });
     this.props.toggleItemComplete(key);
   }
 
@@ -87,49 +41,28 @@ export default class TodoList extends React.Component {
     });
   }
 
+  unswipeRows() {
+    Object.keys(this.rows).forEach(row => {
+      this.rows[row].close();
+    });
+  }
+
   addItem = (key) => {
-    // const {items} = this.state;
-    // const timestamp = Date.now();
-
-    // items[`item-${timestamp}`] = {
-    //   title: key,
-    //   completed: false,
-    //   timestamp,
-    // };
-
-    // let itemKeys = Object.keys(items).reduce((acc, cur) => {
-    //   return [...acc, {title: cur, timestamp: items[cur].timestamp}];
-    // }, []);
-    // itemKeys.sort((a, b) => b.timestamp - a.timestamp);
-    // itemKeys = itemKeys.map(item => item.title);
-
-    // this.setState({
-    //   addClicked: false,
-    //   editClicked: false,
-    //   items,
-    //   itemKeys,
-    // });
     this.setState({
       addClicked: false,
       editClicked: false,
     });
     this.props.addItem(key);
+    this.unswipeRows();
   }
 
   editItem = (newTitle) => {
-    // const {items, editItemKey} = this.state;
-    // items[editItemKey].title = newTitle;
-    // this.setState({
-    //   addClicked: false,
-    //   editClicked: false,
-    //   items,
-    // });
-
     this.setState({
       addClicked: false,
       editClicked: false,
+      editItemKey: null,
     });
-    this.props.editItem(newTitle);
+    this.props.editItem(newTitle, this.state.editItemKey);
   }
 
   deleteItem = (key) => {

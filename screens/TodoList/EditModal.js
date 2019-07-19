@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, AsyncStorage, View, KeyboardAvoidingView} from 'react-native';
 import { Layout, Text, Button, Input} from 'react-native-ui-kitten';
-import {authDetect, base} from '../firebase';
-
 
 export default class EditModal extends React.Component {
   constructor(props) {
