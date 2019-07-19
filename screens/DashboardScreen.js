@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator} from 'react-native';
+import { BottomNavigation, BottomNavigationTab } from 'react-native-ui-kitten';
 import TodoList from './TodoList/TodoList';
 import {authDetect, base, authSignOut} from '../firebase';
 
@@ -11,6 +12,7 @@ class DashboardScreen extends Component {
       items: {},
       itemKeys: [],
       uid: null,
+      selectedIndex: 0,
     }
   }
 
@@ -99,6 +101,28 @@ class DashboardScreen extends Component {
     alert("Something went wrong. Logging out.");
   }
 
+  onSelect = (selectedIndex) => {
+    this.setState({selectedIndex});
+  }
+
+  renderSelectedPage() {
+    const {selectedIndex} = this.state;
+
+    if (selectedIndex === 1) {
+      return (
+        <TodoList
+            key='1'
+            items={this.state.items}
+            itemKeys={this.state.itemKeys}
+            deleteItem={this.deleteItem}
+            editItem={this.editItem}
+            addItem={this.addItem}
+            toggleItemComplete={this.toggleItemComplete}
+          />
+      );
+    }
+  }
+
   render() {
     if (!this.state.uid || !this.itemsRef || !this.itemKeysRef) {
       return (
@@ -108,29 +132,33 @@ class DashboardScreen extends Component {
       )
     }
     return (
-      // <View style={styles.container}>
-      //   <Text>DashboardScreen</Text>
-
-      // </View>
-      [
-      <TodoList
-        key='1'
-        items={this.state.items}
-        itemKeys={this.state.itemKeys}
-        deleteItem={this.deleteItem}
-        editItem={this.editItem}
-        addItem={this.addItem}
-        toggleItemComplete={this.toggleItemComplete}
-      />,
-      <Button
-        key='2'
-        title="Log out"
-        onPress={ () => authSignOut(this.onSuccess, this.onError)}
-        style={styles.logoutBtn}
-      >
-      Log Out
-    </Button>
-    ]
+      <View style={styles.container}>
+        <View style={styles.content}>
+          {this.renderSelectedPage()}
+        </View>
+        <View
+          key='2'
+          style={styles.bottomNav}>
+          <BottomNavigation
+            indicatorStyle={styles.indicator}
+            selectedIndex = {this.state.selectedIndex}
+            onSelect = {this.onSelect}>
+            <BottomNavigationTab title='Home'/>
+            <BottomNavigationTab title='To Do List'/>
+            <BottomNavigationTab title='Grocery List'/>
+            <BottomNavigationTab title='Settings'/>
+          </BottomNavigation>
+        </View>
+      </View>
+    //   <Button
+    //     key='3'
+    //     title="Log out"
+    //     onPress={ () => authSignOut(this.onSuccess, this.onError)}
+    //     style={styles.logoutBtn}
+    //   >
+    //   Log Out
+    // </Button>
+    // ]
     )
   }
 }
@@ -147,5 +175,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     left: 0,
+  },
+  bottomNav: {
+    flex: 1,
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 0,
+    height: 50,
+    left: 0,
+    right: 0,
+  },
+  content: {
+    width: '100%',
+    flex: 1,
+    position: 'relative',
+    marginBottom: 50, // must be same as height of bottomNav
   }
 });
