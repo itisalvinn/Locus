@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {authDetect} from "../firebase";
+import {authDetect} from "../../firebase";
 
 class LoadingScreen extends Component {
 
@@ -11,13 +11,11 @@ class LoadingScreen extends Component {
   checkIfLoggedIn = () => {
     authDetect( (user) => {
       if (user) {
-        return this.props.navigation.navigate('DashBoardScreen');
+        return this.props.navigation.navigate('DashboardScreen');
       }else {
         return this.props.navigation.navigate('LoginScreen');
       }
     });
-
-    return this.props.navigation.navigate('LoginScreen');
   }
 
   render() {
