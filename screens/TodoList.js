@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
-import {authDetect, base} from '../firebase';
 import EditModal from './EditModal';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
@@ -9,9 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default class TodoList extends React.Component {
   state = {
-    items: {},
-    itemKeys: [],
-    uid: null,
     addClicked: false,
     editClicked: false,
     editItemKey: null,
@@ -20,52 +16,53 @@ export default class TodoList extends React.Component {
   rows = {};
 
   componentDidMount() {
-    AsyncStorage.getItem('uid').then(val => {
-      if (!val) {
-        authDetect(async (user) => {
-            if (user) {
-              // User is signed in
-              const uid = user.uid;
-              await AsyncStorage.setItem('uid', uid);
-              this.setState({uid});
-              this.synchronizeStatesWithFirebase(uid);
-            } else {
-              // User is signed out
-              alert("not logged in");
-            }
-          }
-        );
-      } else {
-        this.setState({uid: val});
-        this.synchronizeStatesWithFirebase(val);
-      }
-  });
+  //   AsyncStorage.getItem('uid').then(val => {
+  //     if (!val) {
+  //       authDetect(async (user) => {
+  //           if (user) {
+  //             // User is signed in
+  //             const uid = user.uid;
+  //             await AsyncStorage.setItem('uid', uid);
+  //             this.setState({uid});
+  //             this.synchronizeStatesWithFirebase(uid);
+  //           } else {
+  //             // User is signed out
+  //             alert("not logged in");
+  //           }
+  //         }
+  //       );
+  //     } else {
+  //       this.setState({uid: val});
+  //       this.synchronizeStatesWithFirebase(val);
+  //     }
+  // });
   }
 
-  componentWillUnmount() {
-    this.removeBindingFromFirebase()
-  }
+  // componentWillUnmount() {
+  //   this.removeBindingFromFirebase()
+  // }
 
-  synchronizeStatesWithFirebase(uid) {
-    this.itemsRef = base.syncState(`todo_list/${uid}/items`, {
-      context: this,
-      state: "items"
-    });
-    this.itemKeysRef = base.syncState(`todo_list/${uid}/itemKeys`, {
-      context: this,
-      state: "itemKeys"
-    });
-  }
+  // synchronizeStatesWithFirebase(uid) {
+  //   this.itemsRef = base.syncState(`todo_list/${uid}/items`, {
+  //     context: this,
+  //     state: "items"
+  //   });
+  //   this.itemKeysRef = base.syncState(`todo_list/${uid}/itemKeys`, {
+  //     context: this,
+  //     state: "itemKeys"
+  //   });
+  // }
 
-  removeBindingFromFirebase() {
-    base.removeBinding(this.itemsRef);
-    base.removeBinding(this.itemKeysRef);
-  }
+  // removeBindingFromFirebase() {
+  //   base.removeBinding(this.itemsRef);
+  //   base.removeBinding(this.itemKeysRef);
+  // }
 
   toggleItemComplete(key) {
-    const {items} = this.state;
-    items[key].completed = !items[key].completed;
-    this.setState({ items });
+    // const {items} = this.state;
+    // items[key].completed = !items[key].completed;
+    // this.setState({ items });
+    this.props.toggleItemComplete(key);
   }
 
   onAddPress = () => {
@@ -91,54 +88,57 @@ export default class TodoList extends React.Component {
   }
 
   addItem = (key) => {
-    const {items} = this.state;
-    const timestamp = Date.now();
+    // const {items} = this.state;
+    // const timestamp = Date.now();
 
-    items[`item-${timestamp}`] = {
-      title: key,
-      completed: false,
-      timestamp,
-    };
+    // items[`item-${timestamp}`] = {
+    //   title: key,
+    //   completed: false,
+    //   timestamp,
+    // };
 
-    let itemKeys = Object.keys(items).reduce((acc, cur) => {
-      return [...acc, {title: cur, timestamp: items[cur].timestamp}];
-    }, []);
-    itemKeys.sort((a, b) => b.timestamp - a.timestamp);
-    itemKeys = itemKeys.map(item => item.title);
+    // let itemKeys = Object.keys(items).reduce((acc, cur) => {
+    //   return [...acc, {title: cur, timestamp: items[cur].timestamp}];
+    // }, []);
+    // itemKeys.sort((a, b) => b.timestamp - a.timestamp);
+    // itemKeys = itemKeys.map(item => item.title);
 
+    // this.setState({
+    //   addClicked: false,
+    //   editClicked: false,
+    //   items,
+    //   itemKeys,
+    // });
     this.setState({
       addClicked: false,
       editClicked: false,
-      items,
-      itemKeys,
     });
+    this.props.addItem(key);
   }
 
   editItem = (newTitle) => {
-    const {items, editItemKey} = this.state;
-    items[editItemKey].title = newTitle;
+    // const {items, editItemKey} = this.state;
+    // items[editItemKey].title = newTitle;
+    // this.setState({
+    //   addClicked: false,
+    //   editClicked: false,
+    //   items,
+    // });
+
     this.setState({
       addClicked: false,
       editClicked: false,
-      items,
     });
+    this.props.editItem(newTitle);
   }
 
   deleteItem = (key) => {
-    const {items} = this.state;
-    let {itemKeys} = this.state;
-
-    items[key] = null;
-
-    itemKeys = itemKeys.filter(item => item != key);
-    
     this.setState({
       addClicked: false,
       editClicked: false,
-      items,
-      itemKeys,
     });
 
+    this.props.deleteItem(key);
     this.rows[key].close();
   }
 
@@ -151,9 +151,9 @@ export default class TodoList extends React.Component {
   }
 
   renderItem = (info) => {
-    if (!this.state.itemKeys || !this.state.itemKeys.length) return null;
-    const checkedItem = this.state.items[info.item];
-    const lastItem = info.item === this.state.itemKeys[this.state.itemKeys.length - 1];
+    if (!this.props.itemKeys || !this.props.itemKeys.length) return null;
+    const checkedItem = this.props.items[info.item];
+    const lastItem = info.item === this.props.itemKeys[this.props.itemKeys.length - 1];
     return (
       <Swipeable
       ref={(row) => this.rows[info.item] = row}
@@ -188,7 +188,7 @@ export default class TodoList extends React.Component {
           btnText={'Edit Item'}
           onClose={this.onCloseModalPress}
           onSubmit={this.editItem}
-          text={this.state.items[this.state.editItemKey].title} />
+          text={this.props.items[this.state.editItemKey].title} />
       );
     }
     return null;
@@ -212,7 +212,7 @@ export default class TodoList extends React.Component {
 
 <Layout style={styles.content}>
     <List
-  data={this.state.itemKeys && this.state.itemKeys.length ? this.state.itemKeys : []}
+  data={this.props.itemKeys && this.props.itemKeys.length ? this.props.itemKeys : []}
   renderItem={this.renderItem}
   style={styles.listContainer}
 />
