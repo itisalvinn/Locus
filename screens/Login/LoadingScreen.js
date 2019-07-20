@@ -30,7 +30,6 @@ class LoadingScreen extends Component {
               houseUuid = key;
             }
           }
-          // TODO: Get the houseInfo and then navigate to it
           return this.props.navigation.navigate(
             'DashboardScreen',
             {user, houseUuid, uid: authUser.uid}
