@@ -70,7 +70,8 @@ export const authSignUp = (email, firstName, lastName, password, onSuccess, onEr
             // profile_picture: 'null',
             first_name: firstName,
             last_name: lastName,
-            created_at: Date.now()
+            created_at: Date.now(),
+            
           })
           .then(function (snapshot) {
             console.log('Saved in DB');
