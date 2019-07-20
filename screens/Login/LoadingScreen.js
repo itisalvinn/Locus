@@ -1,19 +1,42 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, AsyncStorage, View} from 'react-native';
 import {authDetect} from "../../firebase";
+import * as firebase from 'firebase';
 
 class LoadingScreen extends Component {
-
   componentDidMount() {
     this.checkIfLoggedIn();
   }
 
   checkIfLoggedIn = () => {
-    authDetect( async (user) => {
-      if (user) {
-        await AsyncStorage.setItem('uid', user.uid);
-        return this.props.navigation.navigate('DashboardScreen');
-      }else {
+    authDetect( async (authUser) => {
+      if (authUser) {
+        await AsyncStorage.setItem('uid', authUser.uid);
+        return firebase.database().ref('/users/' + authUser.uid)
+        .once('value')
+        .then((snapshot) => {
+          const user = snapshot.val();
+          if (!user.houses) {
+            user.houses = {};
+          }
+          const houseKeys = Object.keys(user.houses);
+          let t = 0;
+          let houseUuid = null;
+      
+          for (let i = 0; i < houseKeys.length; i++) {
+            const key = houseKeys[i];
+            if (user.houses[key] > t) {
+              t = user.houses[key];
+              houseUuid = key;
+            }
+          }
+          return this.props.navigation.navigate(
+            'DashboardScreen',
+            {user, houseUuid, uid: authUser.uid}
+          );
+        });
+      } else {
+        await AsyncStorage.setItem('uid', null);
         return this.props.navigation.navigate('LoginScreen');
       }
     });
