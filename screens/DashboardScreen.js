@@ -13,7 +13,6 @@ class DashboardScreen extends Component {
       itemKeys: [],
       uid: props.navigation.state.params ? props.navigation.state.params.uid : null,
       selectedIndex: 0,
-      houses: null,
       user: props.navigation.state.params ? props.navigation.state.params.user : null,
       houseUuid: props.navigation.state.params ? props.navigation.state.params.houseUuid : null,
       houseName: '',
@@ -49,10 +48,6 @@ class DashboardScreen extends Component {
   }
 
   synchronizeHouseStatesWithFirebase(houseUuid) {
-    this.housesRef = base.syncState(`houses/`, {
-      context: this,
-      state: "houses"
-    });
     this.houseNameRef = base.syncState(`houses/${houseUuid}/name`, {
       context: this,
       state: "houseName"
@@ -70,7 +65,6 @@ class DashboardScreen extends Component {
   }
 
   removeHouseBindingFromFirebase() {
-    base.removeBinding(this.housesRef);
     base.removeBinding(this.houseNameRef);
     base.removeBinding(this.houseMembersRef);
   }
@@ -292,9 +286,10 @@ class DashboardScreen extends Component {
             uid={this.state.uid}
             user={this.state.user}
             editHouse={this.editHouse}
-            houseInfo={this.state.houseUuid && this.state.houses ? this.state.houses[this.state.houseUuid] : {}}
             leaveHouse={this.leaveHouse}
             houseUuid={this.state.houseUuid}
+            houseName={this.state.houseName}
+            houseMembers={this.state.houseMembers}
           />
         );
       case 1:

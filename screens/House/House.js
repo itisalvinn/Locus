@@ -14,13 +14,14 @@ export default class House extends React.Component {
     // this.props.leaveHouse("test1");
     // this.props.changeHouse("test6");
     // this.props.editHouse("test1", "test1b");
+    console.log(this.props);
   }
 
   render() {
   return (
     <View style={styles.container}>
       <Layout style={styles.header}>
-        <Text style={styles.text} category='h5'> {this.props.houseUuid || "no house uuid"}</Text>
+        <Text style={styles.text} category='h5'> Hello</Text>
       </Layout>
 
       <Layout>
