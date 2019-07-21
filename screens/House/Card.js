@@ -3,23 +3,16 @@ import { StyleSheet, View, Picker, ScrollView} from 'react-native';
 import { Layout, Text, Button, Input} from 'react-native-ui-kitten';
 
 export class Members extends React.Component {
-  state = {
-    members: []
-  }
-  componentDidMount() {
-    const {members} = this.props;
+  render() {
+    const {members = {}} = this.props;
     const membersArr = (Object.keys(members))
     .map(k => members[k])
     .sort((a, b) => a - b);
-    this.setState({members: membersArr});
-  }
-  render() {
-    const {members} = this.state;
     return (
       <ScrollView
       style={styles.membersWrapper}
       horizontal>
-        {members.map((firstName, i) => (
+        {membersArr.map((firstName, i) => (
           <View
           style={styles.memberName}
           key={`member-${firstName}-${i}`}>

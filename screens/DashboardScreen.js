@@ -161,7 +161,6 @@ class DashboardScreen extends Component {
           }
         };
         houseInfo = {
-          ...houseInfo,
           ...newHouseInfo,
           members: {
             ...members,
