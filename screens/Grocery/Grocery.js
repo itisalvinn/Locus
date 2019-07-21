@@ -78,8 +78,18 @@ export default class Grocery extends React.Component {
 
   swipeRightAction = (key) => {
     const lastItem = key === this.props.groceryItemKeys[this.props.groceryItemKeys.length - 1];
+    const {groceryItems, uid} = this.props;
+    const groceryItem = groceryItems[key] || {};
+    const isParticipating = groceryItem.participants && groceryItem.participants[uid];
+    if (!isParticipating) {
+      return (
+        <RectButton activeOpacity={0} style={lastItem ? [styles.iconBtnContainer, styles.lastIconBtnContainer, styles.disabledIconBtnContainer] : [styles.iconBtnContainer, styles.disabledIconBtnContainer]}>
+          <Ionicons name="ios-trash" size={32} color="#ffffff" />
+        </RectButton>
+      );
+    }
     return (
-      <RectButton style={lastItem ? styles.lastIconBtnContainer : styles.iconBtnContainer} onPress={() => this.deleteItem(key)}>
+      <RectButton style={lastItem ? [styles.iconBtnContainer, styles.lastIconBtnContainer] : styles.iconBtnContainer} onPress={() => this.deleteItem(key)}>
         <Ionicons name="ios-trash" size={32} color="#ffffff" />
       </RectButton>
     );
@@ -280,10 +290,6 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   lastIconBtnContainer: {
-    backgroundColor: 'red',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 70,
     height: 105,
   },
   iconBtnContainer: {
@@ -292,6 +298,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 70,
     height: '100%',
+  },
+  disabledIconBtnContainer: {
+    backgroundColor: '#c6cee0',
   },
   header: {
     flexDirection: 'row',
