@@ -132,7 +132,7 @@ class DashboardScreen extends Component {
     authSignOut(this.onSuccess, this.onError);
   }
 
-  editHouse = (houseUuid, newHouseInfo) => {
+  editHouse = (houseUuid, newHouseInfo /* optional */) => {
     // 1. Remove binding for the current house
     if (this.houseInfoRef) {
       this.removeHouseBindingFromFirebase();
