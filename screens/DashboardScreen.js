@@ -15,7 +15,7 @@ class DashboardScreen extends Component {
       selectedIndex: 0,
       user: props.navigation.state.params ? props.navigation.state.params.user : null,
       houseUuid: props.navigation.state.params ? props.navigation.state.params.houseUuid : null,
-      houseInfo: {},
+      houseInfo: null,
     }
   }
 
@@ -345,14 +345,13 @@ class DashboardScreen extends Component {
   }
 
   render() {
-    const {houseInfo} = this.state;
-    console.log({houseInfo});
     if (
       !this.state.uid ||
       !this.state.user ||
       !this.itemsRef ||
       !this.itemKeysRef ||
-      !this.userRef
+      !this.userRef ||
+      this.state.user && this.state.user.houses && !this.state.houseInfo
       ) {
       return (
         <View style={styles.container}>
