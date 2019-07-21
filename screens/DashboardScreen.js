@@ -331,8 +331,6 @@ class DashboardScreen extends Component {
   }
 
   render() {
-    const {houseInfo} = this.state;
-    console.log({houseInfo});
     if (
       !this.state.uid ||
       !this.state.user ||
