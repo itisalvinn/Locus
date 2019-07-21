@@ -30,11 +30,11 @@ export default class EditModal extends React.Component {
   }
 
   onParticipate = () => {
-    this.props.onParticipate();
+    this.props.onParticipate && this.props.onParticipate();
   }
 
   onUnparticipate = () => {
-    this.props.onUnparticipate();
+    this.props.onUnparticipate && this.props.onUnparticipate();
   }
 
   renderParticipateBtn() {
