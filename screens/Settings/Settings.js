@@ -3,9 +3,9 @@ import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
 import { RectButton } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
-import {authSignOut} from '../firebase';
+import {authSignOut} from '../../firebase';
 
-export default class TodoList extends React.Component {
+export default class Settings extends React.Component {
   state = {
     addClicked: false,
     editClicked: false,

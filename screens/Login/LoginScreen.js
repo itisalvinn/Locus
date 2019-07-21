@@ -39,7 +39,7 @@ class LoginScreen extends Component {
   }
 
   onLoginSuccess = () => {
-    this.props.navigation.navigate('DashboardScreen');
+    this.props.navigation.navigate('LoadingScreen');
   }
 
   handleChange = key => val => {
