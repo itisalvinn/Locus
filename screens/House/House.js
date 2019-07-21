@@ -11,7 +11,7 @@ export default class House extends React.Component {
   }
 
   componentDidMount() {
-    // this.props.leaveHouse("test6");
+    // this.props.leaveHouse("demo-housing2");
     // this.props.changeHouse("test6");
     // this.props.editHouse("test2", "test2 title");
     // console.log(this.props.houseInfo);

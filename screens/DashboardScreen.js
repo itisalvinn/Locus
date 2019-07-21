@@ -23,6 +23,9 @@ class DashboardScreen extends Component {
     this.synchronizeStatesWithFirebase(this.state.uid);
     if (this.state.houseUuid) {
       this.synchronizeHouseStatesWithFirebase(this.state.houseUuid)
+    } else {
+      // For the demo:
+      this.editHouse('demo-housing2', {name: 'Demo Housing2'});
     }
   }
 
@@ -129,9 +132,11 @@ class DashboardScreen extends Component {
     authSignOut(this.onSuccess, this.onError);
   }
 
-  editHouse = (houseUuid, houseName) => {
+  editHouse = (houseUuid, newHouseInfo) => {
     // 1. Remove binding for the current house
-    this.removeHouseBindingFromFirebase();
+    if (this.houseInfoRef) {
+      this.removeHouseBindingFromFirebase();
+    }
 
     // 2. Update the current state with new houseUuid 
     base
@@ -139,12 +144,8 @@ class DashboardScreen extends Component {
         context: this,
       })
       .then(data => {
-        const {name: fetchedName = '', members: fetchedMembers = {}} = data;
         this.setState({
-          houseInfo: {
-            name: fetchedName,
-            members: fetchedMembers,
-          }
+          houseInfo: data
         });
 
         // 3. Synchronize with new houseUuid
@@ -161,25 +162,25 @@ class DashboardScreen extends Component {
         };
         houseInfo = {
           ...houseInfo,
+          ...newHouseInfo,
           members: {
             ...members,
             [uid]: true
           },
-          name: houseName,
         };
         this.setState({houseInfo, user, houseUuid});
-        console.log(this.state);
       })
       .catch(error => {
-        console.log("Couldn't find house")
+        console.log("[editHouse] ", error);
       });
   }
 
   leaveHouse = (houseUuid) => {
-      const leaveCurrentHouse = houseUuid === this.state.houseUuid;
       const oldHouseUuid = this.state.houseUuid;
 
-      this.removeHouseBindingFromFirebase();
+      if (this.houseInfoRef) {
+        this.removeHouseBindingFromFirebase();
+      }
 
         // 2. Update the current state with new houseUuid 
         base
@@ -187,12 +188,8 @@ class DashboardScreen extends Component {
             context: this,
           })
           .then(data => {
-            const {name: fetchedName = '', members: fetchedMembers = {}} = data;
             this.setState({
-              houseInfo: {
-                name: fetchedName,
-                members: fetchedMembers,
-              }
+              houseInfo: data
             });
     
             // 3. Synchronize with new houseUuid
@@ -200,10 +197,10 @@ class DashboardScreen extends Component {
     
             let {user, uid, houseInfo} = this.state;
             let {name = '', members = {}} = houseInfo;
-            user = {
-              ...user,
-              houses: {
-                ...user.houses,
+          user = {
+            ...user,
+            houses: {
+              ...user.houses,
               [houseUuid]: null
             }
           };
@@ -220,34 +217,23 @@ class DashboardScreen extends Component {
           if (!validMembersLen) {
             // House has no member
             houseInfo = null;
-            this.setState({houseInfo, user});
-          } else {
-            this.setState({
-              houseInfo: {
-                ...houseInfo,
-                name,
-                members
-              },
-              user
-            });
           }
+          this.setState({houseInfo, user});
 
             // 5. Redirect to the new houseUuid
             const newHouseUuid = this.getNewLastHouse(oldHouseUuid);
             if (newHouseUuid) {
-              this.removeHouseBindingFromFirebase();
+              if (this.houseInfoRef) {
+                this.removeHouseBindingFromFirebase();
+              }
 
               base
               .fetch(`houses/${newHouseUuid}`, {
                 context: this,
               })
-              .then(data => {
-                const {name: newFetchedName = '', members: newFetchedMembers = {}} = data;
+              .then(newData => {
                 this.setState({
-                  houseInfo: {
-                    name: newFetchedName,
-                    members: newFetchedMembers,
-                  }
+                  houseInfo: newData
                 });
 
                 // 3. Synchronize with newHouseUuid
@@ -278,7 +264,7 @@ class DashboardScreen extends Component {
             }
           })
           .catch(error => {
-            console.log("Couldn't find house")
+            console.log(error);
           });
   }
 
