@@ -32,7 +32,7 @@ export default class Card extends React.Component {
   render() {
   return (
     <View style={styles.wrapper}>
-      <Text category='h6'>{this.props.houseInfo.name}</Text>
+      <Text category='h6'>Members</Text>
       <Members members={this.props.houseInfo.members} />
     </View>
   );

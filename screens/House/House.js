@@ -25,6 +25,9 @@ export default class House extends React.Component {
 
       {this.props.houseInfo ? (
         <View style={styles.cardWrapper}>
+          <View style={{width: '100%', alignItems: 'flex-start', paddingLeft: 20, marginBottom:10}}>
+          <Text category='h5'>{this.props.houseInfo.name}</Text>
+          </View>
           <Card houseInfo={this.props.houseInfo} />
         </View>
       ) : null}
