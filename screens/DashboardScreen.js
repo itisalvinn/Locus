@@ -3,6 +3,7 @@ import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator} from 'r
 import {BottomNavigation, BottomNavigationTab} from 'react-native-ui-kitten';
 import TodoList from './TodoList/TodoList';
 import House from './House/House';
+import Settings from './Settings/Settings';
 import {authDetect, base, authSignOut} from '../firebase';
 
 class DashboardScreen extends Component {
@@ -138,7 +139,7 @@ class DashboardScreen extends Component {
       this.removeHouseBindingFromFirebase();
     }
 
-    // 2. Update the current state with new houseUuid 
+    // 2. Update the current state with new houseUuid
     base
       .fetch(`houses/${houseUuid}`, {
         context: this,
@@ -182,7 +183,7 @@ class DashboardScreen extends Component {
         this.removeHouseBindingFromFirebase();
       }
 
-        // 2. Update the current state with new houseUuid 
+        // 2. Update the current state with new houseUuid
         base
           .fetch(`houses/${houseUuid}`, {
             context: this,
@@ -191,10 +192,10 @@ class DashboardScreen extends Component {
             this.setState({
               houseInfo: data
             });
-    
+
             // 3. Synchronize with new houseUuid
             this.synchronizeHouseStatesWithFirebase(houseUuid);
-    
+
             let {user, uid, houseInfo} = this.state;
             let {name = '', members = {}} = houseInfo;
           user = {
@@ -362,7 +363,7 @@ class DashboardScreen extends Component {
             <BottomNavigationTab title='Grocery List'/>
             <BottomNavigationTab title='Settings'/>
             {/* Below is temporary */}
-            <BottomNavigationTab title='Logout' /> 
+            <BottomNavigationTab title='Logout' />
           </BottomNavigation>
         </View>
       </View>
