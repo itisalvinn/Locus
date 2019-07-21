@@ -20,13 +20,23 @@ class DashboardScreen extends Component {
   }
 
   componentDidMount() {
-    this.synchronizeStatesWithFirebase(this.state.uid);
+    if (this.state.uid) {
+      this.synchronizeStatesWithFirebase(this.state.uid);
+    }
     if (this.state.houseUuid) {
       this.synchronizeHouseStatesWithFirebase(this.state.houseUuid)
     } else {
       // For the demo:
       this.editHouse('demo-housing', {name: 'Demo Housing'});
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.uid !== nextState.uid) {
+      this.removeBindingFromFirebase();
+      this.synchronizeStatesWithFirebase(nextState.uid);
+    }
+    return true;
   }
 
   componentWillUnmount() {
