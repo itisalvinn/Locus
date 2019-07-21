@@ -15,8 +15,7 @@ class DashboardScreen extends Component {
       selectedIndex: 0,
       user: props.navigation.state.params ? props.navigation.state.params.user : null,
       houseUuid: props.navigation.state.params ? props.navigation.state.params.houseUuid : null,
-      houseName: '',
-      houseMembers: {},
+      houseInfo: {},
     }
   }
 
@@ -48,13 +47,9 @@ class DashboardScreen extends Component {
   }
 
   synchronizeHouseStatesWithFirebase(houseUuid) {
-    this.houseNameRef = base.syncState(`houses/${houseUuid}/name`, {
+    this.houseInfoRef = base.syncState(`houses/${houseUuid}`, {
       context: this,
-      state: "houseName"
-    });
-    this.houseMembersRef = base.syncState(`houses/${houseUuid}/members`, {
-      context: this,
-      state: "houseMembers"
+      state: "houseInfo"
     });
   }
 
@@ -65,8 +60,7 @@ class DashboardScreen extends Component {
   }
 
   removeHouseBindingFromFirebase() {
-    base.removeBinding(this.houseNameRef);
-    base.removeBinding(this.houseMembersRef);
+    base.removeBinding(this.houseInfoRef);
   }
 
   toggleItemComplete = (key) => {
@@ -145,16 +139,19 @@ class DashboardScreen extends Component {
         context: this,
       })
       .then(data => {
-        const {name = '', members = {}} = data;
+        const {name: fetchedName = '', members: fetchedMembers = {}} = data;
         this.setState({
-          houseName: name,
-          houseMembers: members,
+          houseInfo: {
+            name: fetchedName,
+            members: fetchedMembers,
+          }
         });
 
         // 3. Synchronize with new houseUuid
         this.synchronizeHouseStatesWithFirebase(houseUuid);
 
-        let {user, houseMembers, uid} = this.state;
+        let {user, houseInfo, uid} = this.state;
+        let {members = {}} = houseInfo;
         user = {
           ...user,
           houses: {
@@ -162,8 +159,15 @@ class DashboardScreen extends Component {
             [houseUuid]: Date.now()
           }
         };
-        houseMembers[uid] = true;
-        this.setState({houseName, houseMembers, user, houseUuid});
+        houseInfo = {
+          ...houseInfo,
+          members: {
+            ...members,
+            [uid]: true
+          },
+          name: houseName,
+        };
+        this.setState({houseInfo, user, houseUuid});
         console.log(this.state);
       })
       .catch(error => {
@@ -175,10 +179,7 @@ class DashboardScreen extends Component {
       const leaveCurrentHouse = houseUuid === this.state.houseUuid;
       const oldHouseUuid = this.state.houseUuid;
 
-        if (!leaveCurrentHouse) {
-          // 1. Remove binding for the current house
-          this.removeHouseBindingFromFirebase();
-        }
+      this.removeHouseBindingFromFirebase();
 
         // 2. Update the current state with new houseUuid 
         base
@@ -186,34 +187,50 @@ class DashboardScreen extends Component {
             context: this,
           })
           .then(data => {
-            const {name, members} = data;
+            const {name: fetchedName = '', members: fetchedMembers = {}} = data;
             this.setState({
-              houseName: name,
-              houseMembers: members,
+              houseInfo: {
+                name: fetchedName,
+                members: fetchedMembers,
+              }
             });
     
-            if (!leaveCurrentHouse) {
-              // 3. Synchronize with new houseUuid
-              this.synchronizeHouseStatesWithFirebase(houseUuid);
-            }
+            // 3. Synchronize with new houseUuid
+            this.synchronizeHouseStatesWithFirebase(houseUuid);
     
-            let {user, houseMembers, uid, houseName} = this.state;
+            let {user, uid, houseInfo} = this.state;
+            let {name = '', members = {}} = houseInfo;
             user = {
               ...user,
               houses: {
                 ...user.houses,
-                [houseUuid]: null
-              }
-            };
-            houseMembers[uid] = null;
-
-            // 4. Check if houseMembers is now empty
-            const validMembersLen = Object.keys(houseMembers).filter(member => houseMembers[member] !== null).length;
-            if (!validMembersLen) {
-              // House has no member
-              houseName = null;
+              [houseUuid]: null
             }
-            this.setState({houseName, houseMembers, user});
+          };
+          houseInfo = {
+            ...houseInfo,
+            members: {
+              ...members,
+              [uid]: null
+            },
+          };
+
+          // 4. Check if members is now empty
+          const validMembersLen = Object.keys(houseInfo.members).filter(member => houseInfo.members[member] !== null).length;
+          if (!validMembersLen) {
+            // House has no member
+            houseInfo = null;
+            this.setState({houseInfo, user});
+          } else {
+            this.setState({
+              houseInfo: {
+                ...houseInfo,
+                name,
+                members
+              },
+              user
+            });
+          }
 
             // 5. Redirect to the new houseUuid
             const newHouseUuid = this.getNewLastHouse(oldHouseUuid);
@@ -225,26 +242,35 @@ class DashboardScreen extends Component {
                 context: this,
               })
               .then(data => {
-                const {name = '', members = {}} = data;
+                const {name: newFetchedName = '', members: newFetchedMembers = {}} = data;
                 this.setState({
-                  houseName: name,
-                  houseMembers: members,
+                  houseInfo: {
+                    name: newFetchedName,
+                    members: newFetchedMembers,
+                  }
                 });
 
                 // 3. Synchronize with newHouseUuid
                 this.synchronizeHouseStatesWithFirebase(newHouseUuid);
 
-                let {user, houseMembers, uid} = this.state;
-                user = {
-                  ...user,
+                let {user: newUser, houseInfo: newHouseInfo, uid} = this.state;
+                let {members: newMembers = {}} = newHouseInfo;
+                newUser = {
+                  ...newUser,
                   houses: {
-                    ...user.houses,
+                    ...newUser.houses,
                     [newHouseUuid]: Date.now()
                   }
                 };
-                houseMembers[uid] = true;
-                this.setState({houseName, houseMembers, user, houseUuid: newHouseUuid});
-                console.log(this.state);
+                newMembers[uid] = true;
+                this.setState({
+                  houseInfo: {
+                    ...newHouseInfo,
+                    members: newMembers
+                  },
+                  user: newUser,
+                  houseUuid: newHouseUuid
+                });
               })
               .catch(error => {
                 console.log("Couldn't find newHouseUuid")
@@ -288,8 +314,7 @@ class DashboardScreen extends Component {
             editHouse={this.editHouse}
             leaveHouse={this.leaveHouse}
             houseUuid={this.state.houseUuid}
-            houseName={this.state.houseName}
-            houseMembers={this.state.houseMembers}
+            houseInfo={this.state.houseInfo}
           />
         );
       case 1:
@@ -320,6 +345,8 @@ class DashboardScreen extends Component {
   }
 
   render() {
+    const {houseInfo} = this.state;
+    console.log({houseInfo});
     if (
       !this.state.uid ||
       !this.state.user ||

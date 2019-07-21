@@ -11,17 +11,17 @@ export default class House extends React.Component {
   }
 
   componentDidMount() {
-    // this.props.leaveHouse("test1");
+    // this.props.leaveHouse("test6");
     // this.props.changeHouse("test6");
-    // this.props.editHouse("test1", "test1b");
-    console.log(this.props);
+    // this.props.editHouse("test2", "test2 title");
+    // console.log(this.props.houseInfo);
   }
 
   render() {
   return (
     <View style={styles.container}>
       <Layout style={styles.header}>
-        <Text style={styles.text} category='h5'> Hello</Text>
+        <Text style={styles.text} category='h5'>{this.props.houseInfo && this.props.houseInfo.name}</Text>
       </Layout>
 
       <Layout>
