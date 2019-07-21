@@ -23,7 +23,7 @@ export default class SignUp extends React.Component {
       this.state.firstName,
       this.state.lastName,
       this.state.password,
-      () => { this.props.navigation.navigate('DashboardScreen') },
+      () => { this.props.navigation.navigate('LoadingScreen') },
       () => {
         this.setState({
           errorMessage: "Sign up didn't work..."

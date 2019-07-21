@@ -318,13 +318,15 @@ class DashboardScreen extends Component {
         );
       case 4:
         return (
-          <Button
-            title="Log out"
-            onPress={async () => await this.signout()}
-            style={styles.logoutBtn}
-          >
-          Log Out
-          </Button>
+          <View style={styles.container}>
+            <Button
+              title="Log out"
+              onPress={async () => await this.signout()}
+              style={styles.logoutBtn}
+            >
+            Log Out
+            </Button>
+          </View>
         )
       default:
         return null;
