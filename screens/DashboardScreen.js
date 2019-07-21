@@ -23,7 +23,7 @@ class DashboardScreen extends Component {
     this.synchronizeStatesWithFirebase(this.state.uid);
     if (this.state.houseUuid) {
       this.synchronizeHouseStatesWithFirebase(this.state.houseUuid)
-    } else {s
+    } else {
       // For the demo:
       this.editHouse('demo-housing2', {name: 'Demo Housing2'});
     }
