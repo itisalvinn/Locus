@@ -37,7 +37,7 @@ class LoadingScreen extends Component {
           );
         });
       } else {
-        await AsyncStorage.setItem('uid', "");
+        await AsyncStorage.setItem('uid', '');
         return this.props.navigation.navigate('LoginScreen');
       }
     });

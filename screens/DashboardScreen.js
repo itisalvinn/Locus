@@ -25,7 +25,7 @@ class DashboardScreen extends Component {
       this.synchronizeHouseStatesWithFirebase(this.state.houseUuid)
     } else {
       // For the demo:
-      this.editHouse('demo-housing2', {name: 'Demo Housing2'});
+      this.editHouse('demo-housing', {name: 'Demo Housing'});
     }
   }
 
@@ -165,7 +165,7 @@ class DashboardScreen extends Component {
           ...newHouseInfo,
           members: {
             ...members,
-            [uid]: true
+            [uid]: user.first_name
           },
         };
         this.setState({houseInfo, user, houseUuid});
@@ -248,7 +248,7 @@ class DashboardScreen extends Component {
                     [newHouseUuid]: Date.now()
                   }
                 };
-                newMembers[uid] = true;
+                newMembers[uid] = newUser.first_name;
                 this.setState({
                   houseInfo: {
                     ...newHouseInfo,
@@ -334,10 +334,7 @@ class DashboardScreen extends Component {
     if (
       !this.state.uid ||
       !this.state.user ||
-      !this.itemsRef ||
-      !this.itemKeysRef ||
-      !this.userRef ||
-      this.state.user && this.state.user.houses && !this.state.houseInfo
+      this.state.user && this.state.user.houses && (!this.state.houseInfo || !this.state.houseInfo.members)
       ) {
       return (
         <View style={styles.container}>
