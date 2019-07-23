@@ -4,6 +4,7 @@ import {BottomNavigation, BottomNavigationTab} from 'react-native-ui-kitten';
 import TodoList from './TodoList/TodoList';
 import House from './House/House';
 import Settings from './Settings/Settings';
+import Grocery from './Grocery/Grocery';
 import {authDetect, base, authSignOut} from '../firebase';
 
 class DashboardScreen extends Component {
@@ -12,6 +13,8 @@ class DashboardScreen extends Component {
     this.state = {
       items: {},
       itemKeys: [],
+      groceryItems: {},
+      groceryItemKeys: [],
       uid: props.navigation.state.params ? props.navigation.state.params.uid : null,
       selectedIndex: 0,
       user: props.navigation.state.params ? props.navigation.state.params.user : null,
@@ -65,6 +68,14 @@ class DashboardScreen extends Component {
       context: this,
       state: "houseInfo"
     });
+    this.groceryItemsRef = base.syncState(`grocery_list/${houseUuid}/items`, {
+      context: this,
+      state: "groceryItems"
+    });
+    this.groceryItemKeysRef = base.syncState(`grocery_list/${houseUuid}/itemKeys`, {
+      context: this,
+      state: "groceryItemKeys"
+    });
   }
 
   removeBindingFromFirebase() {
@@ -75,8 +86,98 @@ class DashboardScreen extends Component {
 
   removeHouseBindingFromFirebase() {
     base.removeBinding(this.houseInfoRef);
+    base.removeBinding(this.groceryItemsRef);
+    base.removeBinding(this.groceryItemKeysRef);
   }
 
+  /* Grocery List */
+  /* =============================== */
+  participateInItem = (key) => {
+    const {groceryItems, uid, user} = this.state;
+    let groceryItem = groceryItems[key];
+    let {participants = {}} = groceryItem;
+    groceryItem = {
+      ...groceryItem,
+      participants: {
+        ...participants,
+        [uid]: user.first_name
+      }
+    };
+
+    groceryItems[key] = groceryItem;
+    this.setState({groceryItems});
+  }
+
+  unparticipateInItem = (key) => {
+    const {groceryItems, uid, user} = this.state;
+    let groceryItem = groceryItems[key];
+    let {participants = {}} = groceryItem;
+    participants = {
+      ...participants,
+      [uid]: null
+    }
+    groceryItem = {
+      ...groceryItem,
+      participants
+    };
+
+    groceryItems[key] = groceryItem;
+    this.setState({groceryItems});
+  }
+
+  toggleGroceryItemComplete = (key) => {
+    const {groceryItems} = this.state;
+    groceryItems[key].completed = !groceryItems[key].completed;
+    this.setState({groceryItems});
+  }
+
+  addGroceryItem = (key) => {
+    const {groceryItems, uid, user} = this.state;
+    const timestamp = Date.now();
+
+    groceryItems[`groceryItem-${timestamp}`] = {
+      title: key,
+      completed: false,
+      timestamp,
+      participants: {
+        [uid]: user.first_name
+      }
+    };
+
+    let groceryItemKeys = Object.keys(groceryItems).reduce((acc, cur) => {
+      return [...acc, {title: cur, timestamp: groceryItems[cur].timestamp}];
+    }, []);
+    groceryItemKeys.sort((a, b) => b.timestamp - a.timestamp);
+    groceryItemKeys = groceryItemKeys.map(item => item.title);
+
+    this.setState({
+      groceryItems,
+      groceryItemKeys,
+    });
+  }
+
+  editGroceryItem = (newTitle, editItemKey) => {
+    const {groceryItems} = this.state;
+    groceryItems[editItemKey].title = newTitle;
+    this.setState({
+      groceryItems,
+    });
+  }
+
+  deleteGroceryItem = (key) => {
+    const {groceryItems} = this.state;
+    let {groceryItemKeys} = this.state;
+    groceryItems[key] = null;
+    groceryItemKeys = groceryItemKeys.filter(item => item != key);
+
+    this.setState({
+      groceryItems,
+      groceryItemKeys,
+    });
+  }
+
+  /* Todo List */
+  /* =============================== */
   toggleItemComplete = (key) => {
     const {items} = this.state;
     items[key].completed = !items[key].completed;
@@ -138,8 +239,8 @@ class DashboardScreen extends Component {
   }
 
   signout = async () => {
-    await AsyncStorage.setItem('uid', "");
-    await AsyncStorage.setItem('houseUuid', "");
+    await AsyncStorage.setItem('uid', '');
+    await AsyncStorage.setItem('houseUuid', '');
     authSignOut(this.onSuccess, this.onError);
   }
 
@@ -149,7 +250,42 @@ class DashboardScreen extends Component {
       this.removeHouseBindingFromFirebase();
     }
 
-    // 2. Update the current state with new houseUuid
+    Promise.all([
+      base.fetch(`houses/${houseUuid}`, {
+        context: this,
+      }),
+      base
+      .fetch(`grocery_list/${houseUuid}`, {
+        context: this,
+      })
+    ]).then(([data, groceryData]) => {
+      this.setState({
+        houseInfo: data,
+      });
+
+      // 3. Synchronize with new houseUuid
+      this.synchronizeHouseStatesWithFirebase(houseUuid);
+
+      let {user, houseInfo, uid} = this.state;
+      let {members = {}} = houseInfo;
+      user = {
+        ...user,
+        houses: {
+          ...user.houses,
+          [houseUuid]: Date.now()
+        }
+      };
+      houseInfo = {
+        ...newHouseInfo,
+        members: {
+          ...members,
+          [uid]: user.first_name
+        },
+      };
+      this.setState({houseInfo, user, houseUuid});
+    })
+
+    // 2. Update the current state with new houseUuid 
     base
       .fetch(`houses/${houseUuid}`, {
         context: this,
@@ -162,8 +298,9 @@ class DashboardScreen extends Component {
         // 3. Synchronize with new houseUuid
         this.synchronizeHouseStatesWithFirebase(houseUuid);
 
-        let {user, houseInfo, uid} = this.state;
+        let {user, houseInfo, uid, groceryItems} = this.state;
         let {members = {}} = houseInfo;
+        let {participants = {}} = groceryItems;
         user = {
           ...user,
           houses: {
@@ -316,7 +453,6 @@ class DashboardScreen extends Component {
       case 1:
         return (
           <TodoList
-            key='1'
             items={this.state.items}
             itemKeys={this.state.itemKeys}
             deleteItem={this.deleteItem}
@@ -325,6 +461,20 @@ class DashboardScreen extends Component {
             toggleItemComplete={this.toggleItemComplete}
           />
         );
+      case 2:
+        return (
+          <Grocery
+          groceryItems={this.state.groceryItems}
+          groceryItemKeys={this.state.groceryItemKeys}
+          deleteGroceryItem={this.deleteGroceryItem}
+          editGroceryItem={this.editGroceryItem}
+          addGroceryItem={this.addGroceryItem}
+          toggleGroceryItemComplete={this.toggleGroceryItemComplete}
+          participateInItem={this.participateInItem}
+          unparticipateInItem={this.unparticipateInItem}
+          uid={this.state.uid}
+          />
+        )
       case 4:
         return (
           <View style={styles.container}>

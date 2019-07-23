@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
-import EditModal from './EditModal';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
+import EditModal from './EditModal';
+import {Members} from '../House/Card';
 
-export default class TodoList extends React.Component {
+export default class Grocery extends React.Component {
   state = {
     addClicked: false,
     editClicked: false,
@@ -16,7 +17,7 @@ export default class TodoList extends React.Component {
   rows = {};
 
   toggleItemComplete(key) {
-    this.props.toggleItemComplete(key);
+    this.props.toggleGroceryItemComplete(key);
   }
 
   onAddPress = () => {
@@ -46,7 +47,7 @@ export default class TodoList extends React.Component {
       addClicked: false,
       editClicked: false,
     });
-    this.props.addItem(key);
+    this.props.addGroceryItem(key);
     Object.keys(this.rows).forEach(row => {
       if (this.rows[row]) {
         this.rows[row].close();
@@ -60,7 +61,7 @@ export default class TodoList extends React.Component {
       editClicked: false,
       editItemKey: null,
     });
-    this.props.editItem(newTitle, this.state.editItemKey);
+    this.props.editGroceryItem(newTitle, this.state.editItemKey);
   }
 
   deleteItem = (key) => {
@@ -69,36 +70,67 @@ export default class TodoList extends React.Component {
       editClicked: false,
     });
 
-    this.props.deleteItem(key);
+    this.props.deleteGroceryItem(key);
     if (this.rows[key]) {
       this.rows[key].close();
     }
   }
 
   swipeRightAction = (key) => {
+    const lastItem = key === this.props.groceryItemKeys[this.props.groceryItemKeys.length - 1];
+    const {groceryItems, uid} = this.props;
+    const groceryItem = groceryItems[key] || {};
+    const isParticipating = groceryItem.participants && groceryItem.participants[uid];
+    if (!isParticipating) {
+      return (
+        <RectButton activeOpacity={0} style={lastItem ? [styles.iconBtnContainer, styles.lastIconBtnContainer, styles.disabledIconBtnContainer] : [styles.iconBtnContainer, styles.disabledIconBtnContainer]}>
+          <Ionicons name="ios-trash" size={32} color="#ffffff" />
+        </RectButton>
+      );
+    }
     return (
-      <RectButton style={styles.iconBtnContainer} onPress={() => this.deleteItem(key)}>
+      <RectButton style={lastItem ? [styles.iconBtnContainer, styles.lastIconBtnContainer] : styles.iconBtnContainer} onPress={() => this.deleteItem(key)}>
         <Ionicons name="ios-trash" size={32} color="#ffffff" />
       </RectButton>
     );
   }
 
+  participate = () => {
+    this.props.participateInItem(this.state.editItemKey);
+    this.onCloseModalPress();
+  }
+
+  unparticipate = () => {
+    this.props.unparticipateInItem(this.state.editItemKey);
+    this.onCloseModalPress();
+  }
+
   renderItem = (info) => {
-    if (!this.props.itemKeys || !this.props.itemKeys.length) return null;
-    const checkedItem = this.props.items[info.item];
-    const lastItem = info.item === this.props.itemKeys[this.props.itemKeys.length - 1];
+    if (!this.props.groceryItemKeys || !this.props.groceryItemKeys.length) return null;
+    const checkedItem = this.props.groceryItems[info.item];
+    const lastItem = info.item === this.props.groceryItemKeys[this.props.groceryItemKeys.length - 1];
+
+    const {groceryItems, uid} = this.props;
+    const groceryItem = groceryItems[info.item] || {};
+    const isParticipating = groceryItem.participants && groceryItem.participants[uid];
     return (
       <Swipeable
       ref={(row) => this.rows[info.item] = row}
       renderRightActions={() => this.swipeRightAction(info.item)}>
         <View style={[styles.listItem, lastItem ? styles.lastListItem : null]}>
         <CheckBox
+          disabled={!isParticipating}
           checked={checkedItem.completed}
           style={styles.checkbx}
           onChange={(checked) => this.toggleItemComplete(info.item)}
         />
         <TouchableOpacity style={styles.todoRow} onPress={() => this.onEditPress(info.item)}>
-          <Text style={[styles.rowText, checkedItem.completed ? styles.checkedText : styles.radioText]}>{checkedItem.title}</Text>
+          <View>
+            <Text style={[styles.rowText, checkedItem.completed ? styles.checkedText : styles.radioText]}>
+              {checkedItem.title}
+            </Text>
+            <Members members={checkedItem.participants} />
+          </View>
         </TouchableOpacity>
       </View>
       </Swipeable>
@@ -112,16 +144,25 @@ export default class TodoList extends React.Component {
           title={'Add Item'}
           btnText={'Add Item'}
           onClose={this.onCloseModalPress}
-          onSubmit={this.addItem} />
+          onSubmit={this.addItem}
+          />
       );
     } else if (this.state.editClicked) {
+      const {editItemKey} = this.state;
+      const {groceryItems, uid} = this.props;
+      const groceryItem = groceryItems[editItemKey] || {};
+      const isParticipating = groceryItem.participants && groceryItem.participants[uid];
+
       return (
         <EditModal
           title={'Edit Item'}
           btnText={'Edit Item'}
           onClose={this.onCloseModalPress}
           onSubmit={this.editItem}
-          text={this.props.items[this.state.editItemKey].title} />
+          text={groceryItem.title}
+          onParticipate={isParticipating? null : this.participate}
+          onUnparticipate={isParticipating ? this.unparticipate : null}
+          />
       );
     }
     return null;
@@ -131,7 +172,7 @@ export default class TodoList extends React.Component {
     return (
     <Layout style={styles.container}>
       <Layout style={styles.header}>
-        <Text style={styles.text} category='h5'>Personal Todo List</Text>
+        <Text style={styles.text} category='h5'>Grocery List</Text>
         <View style={styles.editBtnWrapper}>
           {/* <Button
           style={styles.editBtn}
@@ -145,7 +186,7 @@ export default class TodoList extends React.Component {
 
       <Layout style={styles.content}>
         <List
-          data={this.props.itemKeys && this.props.itemKeys.length ? this.props.itemKeys : []}
+          data={this.props.groceryItemKeys && this.props.groceryItemKeys.length ? this.props.groceryItemKeys : []}
           renderItem={this.renderItem}
           style={styles.listContainer}
         />
@@ -193,8 +234,8 @@ const styles = StyleSheet.create({
   listItem: {
     borderBottomColor: '#f4f4f6',
     borderBottomWidth: 1,
-    backgroundColor: '#ffffff',
-    height: 70,
+    height: 105,
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 10,
@@ -253,12 +294,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500'
   },
+  lastIconBtnContainer: {
+    height: 105,
+  },
   iconBtnContainer: {
     backgroundColor: 'red',
     alignItems: 'center',
     justifyContent: 'center',
     width: 70,
-    height: 70,
+    height: '100%',
+  },
+  disabledIconBtnContainer: {
+    backgroundColor: '#c6cee0',
   },
   header: {
     flexDirection: 'row',
