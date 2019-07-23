@@ -21,13 +21,23 @@ class DashboardScreen extends Component {
   }
 
   componentDidMount() {
-    this.synchronizeStatesWithFirebase(this.state.uid);
+    if (this.state.uid) {
+      this.synchronizeStatesWithFirebase(this.state.uid);
+    }
     if (this.state.houseUuid) {
       this.synchronizeHouseStatesWithFirebase(this.state.houseUuid)
     } else {
       // For the demo:
-      this.editHouse('demo-housing2', {name: 'Demo Housing2'});
+      this.editHouse('demo-housing', {name: 'Demo Housing'});
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.uid !== nextState.uid) {
+      this.removeBindingFromFirebase();
+      this.synchronizeStatesWithFirebase(nextState.uid);
+    }
+    return true;
   }
 
   componentWillUnmount() {
@@ -162,11 +172,10 @@ class DashboardScreen extends Component {
           }
         };
         houseInfo = {
-          ...houseInfo,
           ...newHouseInfo,
           members: {
             ...members,
-            [uid]: true
+            [uid]: user.first_name
           },
         };
         this.setState({houseInfo, user, houseUuid});
@@ -249,7 +258,7 @@ class DashboardScreen extends Component {
                     [newHouseUuid]: Date.now()
                   }
                 };
-                newMembers[uid] = true;
+                newMembers[uid] = newUser.first_name;
                 this.setState({
                   houseInfo: {
                     ...newHouseInfo,
@@ -337,10 +346,7 @@ class DashboardScreen extends Component {
     if (
       !this.state.uid ||
       !this.state.user ||
-      !this.itemsRef ||
-      !this.itemKeysRef ||
-      !this.userRef ||
-      this.state.user && this.state.user.houses && !this.state.houseInfo
+      this.state.user && this.state.user.houses && (!this.state.houseInfo || !this.state.houseInfo.members)
       ) {
       return (
         <View style={styles.container}>

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, View, Picker} from 'react-native';
 import { Layout, Text, Button, Input} from 'react-native-ui-kitten';
+import Card from './Card';
 
 export default class House extends React.Component {
   constructor(props) {
@@ -11,30 +12,25 @@ export default class House extends React.Component {
   }
 
   componentDidMount() {
+    // this.props.editHouse("demo-housing2");
     // this.props.leaveHouse("demo-housing2");
-    // this.props.changeHouse("test6");
-    this.props.editHouse("demo-housing2");
-    this.props.editHouse("demo-housing2", {name: "newTitle"});
-    // console.log(this.props.houseInfo);
   }
 
   render() {
   return (
     <View style={styles.container}>
       <Layout style={styles.header}>
-        <Text style={styles.text} category='h5'>{this.props.houseInfo && this.props.houseInfo.name}</Text>
+        <Text style={styles.text} category='h3'>Hi, {this.props.user && this.props.user.first_name}</Text>
       </Layout>
 
-      <Layout>
-      <Picker
-        selectedValue={this.state.language}
-        onValueChange={(itemValue, itemIndex) =>
-          this.setState({language: itemValue})
-        }>
-        <Picker.Item label="Java" value="java" />
-        <Picker.Item label="JavaScript" value="js" />
-      </Picker>
-      </Layout>
+      {this.props.houseInfo ? (
+        <View style={styles.cardWrapper}>
+          <View style={{width: '100%', alignItems: 'flex-start', paddingLeft: 20, marginBottom:10}}>
+          <Text category='h5'>{this.props.houseInfo.name}</Text>
+          </View>
+          <Card houseInfo={this.props.houseInfo} />
+        </View>
+      ) : null}
     </View>
   );
   }
@@ -52,6 +48,10 @@ const styles = StyleSheet.create({
   },
   text: {
     padding: 20,
+    marginTop: 20,
     flex: 1,
   },
+  cardWrapper: {
+    alignItems: 'center',
+  }
 });
