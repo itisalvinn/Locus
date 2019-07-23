@@ -285,7 +285,7 @@ class DashboardScreen extends Component {
       this.setState({houseInfo, user, houseUuid});
     })
 
-    // 2. Update the current state with new houseUuid 
+    // 2. Update the current state with new houseUuid
     base
       .fetch(`houses/${houseUuid}`, {
         context: this,
@@ -473,6 +473,13 @@ class DashboardScreen extends Component {
           participateInItem={this.participateInItem}
           unparticipateInItem={this.unparticipateInItem}
           uid={this.state.uid}
+          />
+        )
+      case 3:
+        return (
+          <Settings
+            key='3'
+            user={this.state.user}
           />
         )
       case 4:

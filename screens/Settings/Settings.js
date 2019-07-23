@@ -1,38 +1,56 @@
 import * as React from 'react';
 import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
-import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
+import { Button, Layout, Text, List, ListItem} from 'react-native-ui-kitten';
 import { RectButton } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import {authSignOut} from '../../firebase';
 
 export default class Settings extends React.Component {
   state = {
-    addClicked: false,
-    editClicked: false,
-    editItemKey: null,
-  }
 
-  rows = {};
-
-  toggleItemComplete(key) {
-    this.props.toggleItemComplete(key);
   }
 
   onSuccess = () => {
     return this.props.navigation.navigate('LoginScreen');
   }
 
+  onError = () => {
+    alert("Something went wrong logging out.");
+  }
+
+  signout = () => {
+    authSignOut(this.onSuccess, this.onError);
+  }
   render() {
     return (
       <Layout style={styles.container}>
         <Layout style={styles.header}>
           <Text style={styles.text} category='h5'>Settings</Text>
+          <Button
+            title="Log out"
+            onPress={this.signout}
+            style={styles.logoutBtn}
+          >
+          Log Out
+          </Button>
+
         </Layout>
-        <Text style={styles.text} category='h6'> User Info </Text>
-        <Text> First Name: </Text>
-        <Text> Last Name: </Text>
-        <Text> Roommates: </Text>
-        <Text> Quiet Hours </Text>
+        {/*quiet hours button needed?*/}
+        <View style={styles.listItem}>
+          <Text style={styles.rowText}>User Info</Text>
+        </View>
+        <View style={styles.listItem}>
+          <Text style={styles.rowText}> First Name: {this.props.user.first_name} </Text>
+        </View>
+        <View style={styles.listItem}>
+          <Text style={styles.rowText}> Last Name: {this.props.user.last_name} </Text>
+        </View>
+        <View style={styles.listItem}>
+          <Text style={styles.rowText}> Email: {this.props.user.email} </Text>
+        </View>
+        <View style={styles.listItem}>
+        <Text style={styles.rowText}> Houses: {Object.keys(this.props.user.houses).join(", ")} </Text>
+        </View>
       </Layout>
     );
   }
@@ -59,15 +77,7 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
-  listItem: {
-    borderBottomColor: '#f4f4f6',
-    borderBottomWidth: 1,
-    backgroundColor: '#ffffff',
-    height: 70,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 10,
-  },
+
   lastListItem: {
     marginBottom: 80,
   },
@@ -77,6 +87,15 @@ const styles = StyleSheet.create({
   },
   listItemTitle: {
     fontSize: 16
+  },
+  listItem: {
+    borderBottomColor: '#f4f4f6',
+    borderBottomWidth: 1,
+    backgroundColor: '#ffffff',
+    height: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
   },
   listContainer: {
     width: "100%",
@@ -90,49 +109,16 @@ const styles = StyleSheet.create({
   rowText: {
     fontWeight: '500',
   },
-  checkedText: {
-    color: "#c6cee0"
-  },
-  radioText: {
-    color: '#394159'
-  },
-  btnWrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    width: 100,
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-  },
-  editBtnWrapper: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  addBtn: {
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  editBtn: {
-    marginRight: 10,
-  },
-  btnText: {
-    fontSize: 15,
-    fontWeight: '500'
-  },
-  iconBtnContainer: {
-    backgroundColor: 'red',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 70,
-    height: 70,
-  },
   header: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     paddingTop: 20,
   },
+  logoutBtn: {
+    position: 'absolute',
+    marginTop: -3,
+    alignSelf: 'flex-end',
+    right: 4,
+  }
 });
