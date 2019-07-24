@@ -18,10 +18,10 @@ const firebaseConfig = {
 	messagingSenderId: "380731318846",
 	appId: "1:380731318846:web:6ba151faefb447f1"
 };
-export const firebaseInit = () => {
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-}
+// export const firebaseInit = () => {
+//   // Initialize Firebase
+//   firebase.initializeApp(firebaseConfig);
+// }
 
 export const app = firebase.initializeApp(firebaseConfig);
 export const base = Rebase.createClass(app.database());
@@ -197,19 +197,9 @@ export const authWithGoogle = async (onSuccess, onError) => {
     });
 
     if (result.type === 'success') {
+      console.log("Successfully signed in with google.")
       onGoogleSignIn(result);
       onSuccess();
-      // const {idToken, accessToken} = result;
-      // const credential = firebase.auth.GoogleAuthProvider.credential(
-      //   idToken,
-      //   accessToken
-      // );
-
-      // firebase
-      //   .auth()
-      //   .signInAndRetrieveDataWithCredential(credential)
-      //   .then(onSuccess)
-      //   .catch(onError);
     } else {
       onError({
         cancelled: true
@@ -222,23 +212,16 @@ export const authWithGoogle = async (onSuccess, onError) => {
 
 const onGoogleSignIn = (googleUser) => {
   console.log('Google Auth Response', googleUser);
-  console.log('test');
   // We need to register an Observer on Firebase Auth to make sure auth is initialized.
   var unsubscribe = firebase.auth().onAuthStateChanged(function (firebaseUser) {
-    console.log('Before Unsubscribe method');
     unsubscribe();
-    console.log('After Unsubscribe method');
     // Check if we are already signed-in Firebase with the correct user.
-    // if (!isUserEqual(googleUser, firebaseUser)) {
-    if (true) {
-      console.log('Why Lord');
+    if (!isUserEqual(googleUser, firebaseUser)) {
       // Build Firebase credential with the Google ID token.
       var credential = firebase.auth.GoogleAuthProvider.credential(
-        // googleUser.getAuthResponse().id_token);
         googleUser.idToken,
         googleUser.accessToken
       );
-      console.log('Before firebase auth');
       console.log('Credential is: ', credential);
       // Sign in with credential from the Google user.
       firebase.auth()
