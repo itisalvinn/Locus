@@ -97,7 +97,7 @@ export default class TodoList extends React.Component {
         <Text style={styles.text} category='h5'>
           Roommate Quiet Hours
         </Text>
-        {Object.entries(houseQuietHours)
+        {houseQuietHours && Object.entries(houseQuietHours)
           .filter((entry) => {
             return entry[0] != uid;
           })
@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   memberName: {
-    backgroundColor: '#ffffff',
     paddingHorizontal: 15,
     paddingVertical: 3,
     borderRadius: 50,
