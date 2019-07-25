@@ -15,7 +15,7 @@ export default class Settings extends React.Component {
   }
 
   onError = () => {
-    alert("Something went wrong logging out.");
+    //alert("Something went wrong logging out.");
   }
 
   signout = () => {

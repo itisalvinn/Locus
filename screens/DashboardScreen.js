@@ -3,6 +3,7 @@ import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator} from 'r
 import {BottomNavigation, BottomNavigationTab} from 'react-native-ui-kitten';
 import TodoList from './TodoList/TodoList';
 import House from './House/House';
+import QuietHours from './QuietHours/QuietHours';
 import Settings from './Settings/Settings';
 import Grocery from './Grocery/Grocery';
 import {authDetect, base, authSignOut} from '../firebase';
@@ -255,9 +256,9 @@ class DashboardScreen extends Component {
         context: this,
       }),
       base
-      .fetch(`grocery_list/${houseUuid}`, {
-        context: this,
-      })
+        .fetch(`grocery_list/${houseUuid}`, {
+          context: this,
+        })
     ]).then(([data, groceryData]) => {
       this.setState({
         houseInfo: data,
@@ -323,96 +324,96 @@ class DashboardScreen extends Component {
   }
 
   leaveHouse = (houseUuid) => {
-      const oldHouseUuid = this.state.houseUuid;
+    const oldHouseUuid = this.state.houseUuid;
 
-      if (this.houseInfoRef) {
-        this.removeHouseBindingFromFirebase();
-      }
+    if (this.houseInfoRef) {
+      this.removeHouseBindingFromFirebase();
+    }
 
-        // 2. Update the current state with new houseUuid
-        base
-          .fetch(`houses/${houseUuid}`, {
-            context: this,
-          })
-          .then(data => {
-            this.setState({
-              houseInfo: data
-            });
+    // 2. Update the current state with new houseUuid
+    base
+      .fetch(`houses/${houseUuid}`, {
+        context: this,
+      })
+      .then(data => {
+        this.setState({
+          houseInfo: data
+        });
 
-            // 3. Synchronize with new houseUuid
-            this.synchronizeHouseStatesWithFirebase(houseUuid);
+        // 3. Synchronize with new houseUuid
+        this.synchronizeHouseStatesWithFirebase(houseUuid);
 
-            let {user, uid, houseInfo} = this.state;
-            let {name = '', members = {}} = houseInfo;
-          user = {
-            ...user,
-            houses: {
-              ...user.houses,
-              [houseUuid]: null
-            }
-          };
-          houseInfo = {
-            ...houseInfo,
-            members: {
-              ...members,
-              [uid]: null
-            },
-          };
-
-          // 4. Check if members is now empty
-          const validMembersLen = Object.keys(houseInfo.members).filter(member => houseInfo.members[member] !== null).length;
-          if (!validMembersLen) {
-            // House has no member
-            houseInfo = null;
+        let {user, uid, houseInfo} = this.state;
+        let {name = '', members = {}} = houseInfo;
+        user = {
+          ...user,
+          houses: {
+            ...user.houses,
+            [houseUuid]: null
           }
-          this.setState({houseInfo, user});
+        };
+        houseInfo = {
+          ...houseInfo,
+          members: {
+            ...members,
+            [uid]: null
+          },
+        };
 
-            // 5. Redirect to the new houseUuid
-            const newHouseUuid = this.getNewLastHouse(oldHouseUuid);
-            if (newHouseUuid) {
-              if (this.houseInfoRef) {
-                this.removeHouseBindingFromFirebase();
-              }
+        // 4. Check if members is now empty
+        const validMembersLen = Object.keys(houseInfo.members).filter(member => houseInfo.members[member] !== null).length;
+        if (!validMembersLen) {
+          // House has no member
+          houseInfo = null;
+        }
+        this.setState({houseInfo, user});
 
-              base
-              .fetch(`houses/${newHouseUuid}`, {
-                context: this,
-              })
-              .then(newData => {
-                this.setState({
-                  houseInfo: newData
-                });
+        // 5. Redirect to the new houseUuid
+        const newHouseUuid = this.getNewLastHouse(oldHouseUuid);
+        if (newHouseUuid) {
+          if (this.houseInfoRef) {
+            this.removeHouseBindingFromFirebase();
+          }
 
-                // 3. Synchronize with newHouseUuid
-                this.synchronizeHouseStatesWithFirebase(newHouseUuid);
-
-                let {user: newUser, houseInfo: newHouseInfo, uid} = this.state;
-                let {members: newMembers = {}} = newHouseInfo;
-                newUser = {
-                  ...newUser,
-                  houses: {
-                    ...newUser.houses,
-                    [newHouseUuid]: Date.now()
-                  }
-                };
-                newMembers[uid] = newUser.first_name;
-                this.setState({
-                  houseInfo: {
-                    ...newHouseInfo,
-                    members: newMembers
-                  },
-                  user: newUser,
-                  houseUuid: newHouseUuid
-                });
-              })
-              .catch(error => {
-                console.log("Couldn't find newHouseUuid")
+          base
+            .fetch(`houses/${newHouseUuid}`, {
+              context: this,
+            })
+            .then(newData => {
+              this.setState({
+                houseInfo: newData
               });
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
+
+              // 3. Synchronize with newHouseUuid
+              this.synchronizeHouseStatesWithFirebase(newHouseUuid);
+
+              let {user: newUser, houseInfo: newHouseInfo, uid} = this.state;
+              let {members: newMembers = {}} = newHouseInfo;
+              newUser = {
+                ...newUser,
+                houses: {
+                  ...newUser.houses,
+                  [newHouseUuid]: Date.now()
+                }
+              };
+              newMembers[uid] = newUser.first_name;
+              this.setState({
+                houseInfo: {
+                  ...newHouseInfo,
+                  members: newMembers
+                },
+                user: newUser,
+                houseUuid: newHouseUuid
+              });
+            })
+            .catch(error => {
+              console.log("Couldn't find newHouseUuid")
+            });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   getNewLastHouse = (avoidHouseUuid) => {
@@ -464,25 +465,35 @@ class DashboardScreen extends Component {
       case 2:
         return (
           <Grocery
-          groceryItems={this.state.groceryItems}
-          groceryItemKeys={this.state.groceryItemKeys}
-          deleteGroceryItem={this.deleteGroceryItem}
-          editGroceryItem={this.editGroceryItem}
-          addGroceryItem={this.addGroceryItem}
-          toggleGroceryItemComplete={this.toggleGroceryItemComplete}
-          participateInItem={this.participateInItem}
-          unparticipateInItem={this.unparticipateInItem}
-          uid={this.state.uid}
+            groceryItems={this.state.groceryItems}
+            groceryItemKeys={this.state.groceryItemKeys}
+            deleteGroceryItem={this.deleteGroceryItem}
+            editGroceryItem={this.editGroceryItem}
+            addGroceryItem={this.addGroceryItem}
+            toggleGroceryItemComplete={this.toggleGroceryItemComplete}
+            participateInItem={this.participateInItem}
+            unparticipateInItem={this.unparticipateInItem}
+            uid={this.state.uid}
           />
         )
       case 3:
+        return (
+          <QuietHours
+            uid={this.state.uid}
+            user={this.state.user}
+            houseUuid={this.state.houseUuid}
+            houseInfo={this.state.houseInfo}
+          />
+        );
+      case 4:
         return (
           <Settings
             key='3'
             user={this.state.user}
           />
-        )
-      case 4:
+        );
+      /* remove for now
+      case 5:
         return (
           <View style={styles.container}>
             <Button
@@ -490,10 +501,10 @@ class DashboardScreen extends Component {
               onPress={async () => await this.signout()}
               style={styles.logoutBtn}
             >
-            Log Out
+              Log Out
             </Button>
           </View>
-        )
+        ) */
       default:
         return null;
     }
@@ -504,7 +515,7 @@ class DashboardScreen extends Component {
       !this.state.uid ||
       !this.state.user ||
       this.state.user && this.state.user.houses && (!this.state.houseInfo || !this.state.houseInfo.members)
-      ) {
+    ) {
       return (
         <View style={styles.container}>
           <ActivityIndicator size={"large"}/>
@@ -526,9 +537,10 @@ class DashboardScreen extends Component {
             <BottomNavigationTab title='Home'/>
             <BottomNavigationTab title='To Do List'/>
             <BottomNavigationTab title='Grocery List'/>
+            <BottomNavigationTab title='Quiet Hours'/>
             <BottomNavigationTab title='Settings'/>
             {/* Below is temporary */}
-            <BottomNavigationTab title='Logout' />
+            {/* <BottomNavigationTab title='Logout'/> */}
           </BottomNavigation>
         </View>
       </View>
