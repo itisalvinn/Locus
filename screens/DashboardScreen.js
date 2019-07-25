@@ -487,6 +487,14 @@ class DashboardScreen extends Component {
         );
       case 4:
         return (
+          <Settings
+            key='3'
+            user={this.state.user}
+          />
+        );
+      /* remove for now
+      case 5:
+        return (
           <View style={styles.container}>
             <Button
               title="Log out"
@@ -496,7 +504,7 @@ class DashboardScreen extends Component {
               Log Out
             </Button>
           </View>
-        )
+        ) */
       default:
         return null;
     }
@@ -532,7 +540,7 @@ class DashboardScreen extends Component {
             <BottomNavigationTab title='Quiet Hours'/>
             <BottomNavigationTab title='Settings'/>
             {/* Below is temporary */}
-            <BottomNavigationTab title='Logout'/>
+            {/* <BottomNavigationTab title='Logout'/> */}
           </BottomNavigation>
         </View>
       </View>
