@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator} from 'react-native';
+import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator, Platform} from 'react-native';
 import {BottomNavigation, BottomNavigationTab} from 'react-native-ui-kitten';
 import TodoList from './TodoList/TodoList';
 import House from './House/House';
 import QuietHours from './QuietHours/QuietHours';
 import Settings from './Settings/Settings';
 import Grocery from './Grocery/Grocery';
+import { MaterialIcons } from '@expo/vector-icons';
 import {authDetect, base, authSignOut} from '../firebase';
 
 class DashboardScreen extends Component {
@@ -511,6 +512,7 @@ class DashboardScreen extends Component {
   }
 
   render() {
+
     if (
       !this.state.uid ||
       !this.state.user ||
@@ -522,26 +524,26 @@ class DashboardScreen extends Component {
         </View>
       )
     }
+
     return (
       <View style={styles.container}>
+      <View
+        style={styles.bottomNav}>
+        <BottomNavigation
+          indicatorStyle={styles.indicator}
+          selectedIndex={this.state.selectedIndex}
+          onSelect={this.onSelect}>
+          <BottomNavigationTab title='Home'/>
+          <BottomNavigationTab title='To Do List'/>
+          <BottomNavigationTab title='Grocery List'/>
+          <BottomNavigationTab title='Quiet Hours'/>
+          <BottomNavigationTab title='Settings'/>
+          {/* Below is temporary */}
+          {/* <BottomNavigationTab title='Logout'/> */}
+        </BottomNavigation>
+      </View>
         <View style={styles.content}>
           {this.renderSelectedPage()}
-        </View>
-
-        <View
-          style={styles.bottomNav}>
-          <BottomNavigation
-            indicatorStyle={styles.indicator}
-            selectedIndex={this.state.selectedIndex}
-            onSelect={this.onSelect}>
-            <BottomNavigationTab title='Home'/>
-            <BottomNavigationTab title='To Do List'/>
-            <BottomNavigationTab title='Grocery List'/>
-            <BottomNavigationTab title='Quiet Hours'/>
-            <BottomNavigationTab title='Settings'/>
-            {/* Below is temporary */}
-            {/* <BottomNavigationTab title='Logout'/> */}
-          </BottomNavigation>
         </View>
       </View>
     )
@@ -566,8 +568,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     position: 'absolute',
+    height: Platform.OS === 'ios' ? 70 : 50,
     bottom: 0,
-    height: 50,
     left: 0,
     right: 0,
   },
