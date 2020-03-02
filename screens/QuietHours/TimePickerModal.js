@@ -80,15 +80,16 @@ export default class TimePickerModal extends Component {
 
   render() {
     return (
-      <View style={{marginTop: 22}}>
+      <View>
         <Modal
+          style={styles.modal}
           animationType="slide"
-          transparent={false}
+          transparent={true}
           visible={this.state.modalVisible}
           onRequestClose={() => {
             Alert.alert('Modal has been closed.');
           }}>
-          <View style={{marginTop: 22}}>
+          <View style={styles.modalView}>
             <DatePickerIOS
               date={this.state.time}
               onDateChange={this.setTime}
@@ -138,5 +139,22 @@ const styles = StyleSheet.create({
     // width: '80%',
     paddingBottom: 10,
     flexDirection: 'row'
+  },
+  modal: {
+    // justifyContent: 'flex-start',
+    // backgroundColor: 'black',
+    // alignItem: 'center'
+    position: 'absolute',
+    bottom:0,
+    left:0,
+    height: '10%'
+  },
+  modalView: {
+    backgroundColor: 'white',
+    width:  '95%',
+    // height: '80%',
+    alignSelf: 'flex-start',
+    top: '15%',
+    borderRadius: '3%',
   }
 });
