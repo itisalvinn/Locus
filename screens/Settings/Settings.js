@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
 import { Button, Layout, Text, List, ListItem} from 'react-native-ui-kitten';
 import { RectButton } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import {authSignOut} from '../../firebase';
 
 export default class Settings extends React.Component {
@@ -21,6 +21,7 @@ export default class Settings extends React.Component {
   signout = () => {
     authSignOut(this.onSuccess, this.onError);
   }
+
   render() {
     return (
       <Layout style={styles.container}>
@@ -35,21 +36,22 @@ export default class Settings extends React.Component {
           </Button>
 
         </Layout>
-        {/*quiet hours button needed?*/}
+        {/*quiet hours active / not active needed?*/}
         <View style={styles.listItem}>
-          <Text style={styles.rowText}>User Info</Text>
+          <FontAwesome name="user" size={32}/>
+          <Text style={styles.rowText}>   User Info </Text>
         </View>
         <View style={styles.listItem}>
-          <Text style={styles.rowText}> First Name: {this.props.user.first_name} </Text>
+          <Text style={styles.rowText}> First Name {"\n"} {this.props.user.first_name} </Text>
         </View>
         <View style={styles.listItem}>
-          <Text style={styles.rowText}> Last Name: {this.props.user.last_name} </Text>
+          <Text style={styles.rowText}> Last Name {"\n"} {this.props.user.last_name} </Text>
         </View>
         <View style={styles.listItem}>
-          <Text style={styles.rowText}> Email: {this.props.user.email} </Text>
+          <Text style={styles.rowText}> Email {"\n"} {this.props.user.email} </Text>
         </View>
         <View style={styles.listItem}>
-        <Text style={styles.rowText}> Houses: {Object.keys(this.props.user.houses).join(", ")} </Text>
+          <Text style={styles.rowText}> Houses {"\n"} {Object.keys(this.props.user.houses).join(", ")} </Text>
         </View>
       </Layout>
     );
@@ -76,6 +78,7 @@ const styles = StyleSheet.create({
   text: {
     padding: 20,
     flex: 1,
+    color: 'white',
   },
 
   lastListItem: {
@@ -114,11 +117,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     paddingTop: 20,
+    backgroundColor: 'black',
   },
   logoutBtn: {
-    position: 'absolute',
-    marginTop: -3,
-    alignSelf: 'flex-end',
-    right: 4,
+    position: 'relative',
+    marginTop: 2,
+    right: 10,
   }
 });

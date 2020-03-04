@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, AsyncStorage, Alert } from 'react-native';
+import { StyleSheet, Text, View, AsyncStorage, Alert, Image } from 'react-native';
 import { authLogin, authWithGoogle} from "../../firebase";
 import { Input, Button } from 'react-native-ui-kitten';
 
@@ -51,7 +51,12 @@ class LoginScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-
+        <View>
+        <Image
+          style={{width: 250, height: 147, marginTop: 100, backgroundColor: 'transparent'}}
+          source={require('../../assets/logo_2.png')}
+          />
+        </View>
         <View style={styles.login}>
           <Input
               placeholder="Email"
@@ -72,7 +77,7 @@ class LoginScreen extends Component {
             Log In
           </Button>
 
-          <Text>Or</Text>
+          <Text></Text>
 
           <Button onPress={this.signInWithGoogle}>
             Sign in With Google
