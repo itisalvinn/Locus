@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Modal, View, Alert, StyleSheet, DatePickerIOS} from 'react-native';
+import {Modal, View, Alert, StyleSheet} from 'react-native';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {Button} from 'react-native-ui-kitten';
 import * as firebase from 'firebase';
 
@@ -90,12 +91,18 @@ export default class TimePickerModal extends Component {
             Alert.alert('Modal has been closed.');
           }}>
           <View style={styles.modalView}>
-            <DatePickerIOS
-              date={this.state.time}
-              onDateChange={this.setTime}
-              mode={'time'}
-              // initialDate={something}
+            <DateTimePickerModal
+              isVisible={this.state.modalVisible}
+              mode="time"
+              onConfirm={this.handleTimeSubmission}
+              onCancel={this.setModalVisible(!this.state.modalVisible)}
             />
+            {/*<DatePickerIOS*/}
+            {/*  date={this.state.time}*/}
+            {/*  onDateChange={this.setTime}*/}
+            {/*  mode={'time'}*/}
+            {/*  // initialDate={something}*/}
+            {/*/>*/}
             <Button onPress={this.handleTimeSubmission}>
               Set Hours
             </Button>
@@ -145,13 +152,13 @@ const styles = StyleSheet.create({
     // backgroundColor: 'black',
     // alignItem: 'center'
     position: 'absolute',
-    bottom:0,
-    left:0,
+    bottom: 0,
+    left: 0,
     height: '10%'
   },
   modalView: {
     backgroundColor: 'white',
-    width:  '95%',
+    width: '95%',
     // height: '80%',
     alignSelf: 'flex-start',
     top: '15%',
