@@ -1,8 +1,10 @@
 import * as React from 'react';
 import Toast, {DURATION} from 'react-native-easy-toast';
-import { StyleSheet, View, Clipboard, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Clipboard, TouchableOpacity, ScrollView, SafeAreaView} from 'react-native';
 import { Layout, Text, Button, Input, Modal} from 'react-native-ui-kitten';
 import Card from './Card';
+import EditModal from '../TodoList/EditModal';
+import Constants from 'expo-constants';
 
 export default class House extends React.Component {
   constructor(props) {
@@ -12,6 +14,7 @@ export default class House extends React.Component {
       shouldShowCreate: false,
       shouldShowLeaveHouse: false,
       showLeaveBtn: false,
+      shouldShowJoin: false,
     }
   }
 
@@ -45,11 +48,35 @@ export default class House extends React.Component {
     })
   }
 
-  createNewHouse = () => {
-    const houseName = this.refs.createHouse.textInputRef.current._lastNativeText;
+  createNewHouse = (houseName) => {
     const newHouseUuid = this.props.createNewHouse();
     this.props.editHouse(newHouseUuid, {name: houseName});
     this.hideCreateModal();
+  }
+
+  showJoinModal = () => {
+    this.setState({
+      shouldShowJoin: true,
+    });
+  }
+
+  hideJoinModal = () => {
+    this.setState({
+      shouldShowJoin: false,
+    })
+  }
+
+  joinHouse = () => {
+    const inviteCode = this.refs.joinHouse.textInputRef.current._lastNativeText;
+    const isValidCode = this.props.isValidInviteCode(inviteCode);
+    if (isValidCode) {
+      // Valid code
+      this.props.joinHouseFromInvite(inviteCode);
+    } else {
+      // Invalid code
+    this.refs.toast.show('Invalid Code');
+    }
+    this.hideJoinModal();
   }
 
   showLeaveModal = () => {
@@ -70,7 +97,6 @@ export default class House extends React.Component {
   }
 
   onCardPress = () => {
-    console.log("Card pressed");
     const {showLeaveBtn} = this.state;
     this.setState({
       showLeaveBtn: !showLeaveBtn,
@@ -98,11 +124,11 @@ export default class House extends React.Component {
   }
 
   render() {
-    console.log(this.state);
-    const {shouldShowInvite, shouldShowCreate, shouldShowLeaveHouse, showLeaveBtn} = this.state;
-    const {houses, houseUuid, user} = this.props;
+    const {shouldShowInvite, shouldShowCreate, shouldShowLeaveHouse, showLeaveBtn, shouldShowJoin} = this.state;
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <Layout level='1' style={styles.content}>
       <Layout level='1' style={styles.header}>
         <Text style={styles.text} category='h3'>Hi, {this.props.user && this.props.user.first_name}</Text>
       </Layout>
@@ -122,54 +148,50 @@ export default class House extends React.Component {
       ) : null}
 
       {this.renderHouseNames()}
+      </Layout>
+      </ScrollView>
 
-      {shouldShowCreate || shouldShowInvite || shouldShowLeaveHouse ? (
+      {shouldShowCreate || shouldShowInvite || shouldShowLeaveHouse || shouldShowJoin ? (
         <Layout level='2' style={styles.overlay} />
       ) : null}
 
-      <Modal visible={shouldShowInvite} allowBackdrop={true}>
-        <Layout
-          level='2'
-          style={styles.modalContainer}>
-          <Input
-                style={styles.input}
-                status='primary'
-                value={this.props.getInviteCode(this.props.houseUuid)}
-                label='Invite Code'
-              />
-          <Layout style={styles.btnContainer} level='2'>
-            <Button status='danger' onPress={this.hideInviteModal} style={styles.leftBtn}>
-              Cancel
-            </Button>
-            <Button onPress={this.copyInviteCode} appearance='outline' style={styles.rightBtn}>
-              Copy Code
-            </Button>
-          </Layout>
-        </Layout>
-      </Modal>
+      {shouldShowInvite ? (
+        <View style={styles.editModalContainer}>
+          <EditModal
+            title={'Invite Code'}
+            btnText={'Copy Code'}
+            onClose={this.hideInviteModal}
+            onSubmit={this.copyInviteCode}
+            text={this.props.getInviteCode(this.props.houseUuid)}
+            autoFocus={false}
+            placeholder='Invite code...'
+            clearOnSubmit={false}
+            disabled={true}
+            style={{...styles.editModal, ...styles.editInviteModal}} />
+          </View>
+      ) : null}
 
-      <Modal visible={shouldShowCreate} allowBackdrop={true}>
-        <Layout
-          level='2'
-          style={styles.modalContainer}>
-            <Input
-                style={styles.input}
-                status='primary'
-                placeholder=''
-                label='House Name'
-                onChangeText={this.onHouseNameChange}
-                ref="createHouse"
-              />
-              <Layout style={styles.btnContainer} level='2'>
-            <Button status='danger' onPress={this.hideCreateModal} style={styles.leftBtn}>
-              Cancel
-            </Button>
-            <Button onPress={this.createNewHouse} appearance='outline' style={styles.rightBtn}>
-              Create House
-            </Button>
-          </Layout>
-          </Layout>
-      </Modal>
+      {shouldShowCreate ? (
+        <View style={styles.editModalContainer}>
+          <EditModal
+            title={'Create House'}
+            btnText={'Create House'}
+            onClose={this.hideCreateModal}
+            onSubmit={this.createNewHouse}
+            placeholder='Name...' />
+          </View>
+      ) : null}
+
+      {shouldShowJoin ? (
+        <View style={styles.editModalContainer}>
+          <EditModal
+            title={'Join House'}
+            btnText={'Join House'}
+            onClose={this.hideJoinModal}
+            onSubmit={this.joinHouse}
+            placeholder='Invite code...' />
+          </View>
+      ) : null}
 
       <Modal visible={shouldShowLeaveHouse} allowBackdrop={true}>
         <Layout
@@ -189,10 +211,12 @@ export default class House extends React.Component {
 
       <Toast ref="toast" duration={DURATION.LENGTH_SHORT}/>
 
+      <Layout level='3' style={{...styles.createBtnWrapper, ...styles.createBtnBackdrop}} />
       <View style={styles.createBtnWrapper}>
-        <Button onPress={this.showCreateModal}>Create New House</Button>
+        <Button onPress={this.showJoinModal} style={styles.leftBtn}>Join</Button>
+        <Button onPress={this.showCreateModal} style={styles.rightBtn}>Create</Button>
       </View>
-    </View>
+    </SafeAreaView>
   );
   }
 }
@@ -200,12 +224,13 @@ export default class House extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: Constants.statusBarHeight,
   },
   header: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 10,
   },
   text: {
     padding: 20,
@@ -227,8 +252,13 @@ const styles = StyleSheet.create({
   modalContainer: {
     padding: 20,
     borderWidth: 1,
-    borderColor: "#f2f6ff",
+    borderColor: "#eee",
     borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   btnContainer: {
     flexDirection: 'row',
@@ -251,10 +281,15 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
-    width: 300,
+    width: "100%",
+    padding: 20,
     position: 'absolute',
-    right: 20,
-    bottom: 20,
+    right: 0,
+    bottom: 0,
+    height: 85,
+  },
+  createBtnBackdrop: {
+    opacity: 0.3,
   },
   overlay: {
     position: 'absolute',
@@ -262,7 +297,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    opacity: 0.5,
+    opacity: 0.7,
     zIndex: 10,
   },
   otherHouseWrapper: {
@@ -289,5 +324,35 @@ const styles = StyleSheet.create({
     borderTopColor: "#eee",
     margin: 20,
     paddingTop: 20,
+  },
+  editModalContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: "100%",
+    width: "100%",
+    zIndex: 10,
+    position: 'absolute',
+  },
+  editModal: {
+    position: 'relative',
+    zIndex: 11,
+    display: 'flex',
+    width: '100%',
+    height: 170,
+    borderColor: "#eee",
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+    borderRadius: 5,
+  },
+  editInviteModal: {
+    width: "90%",
+  },
+  content: {
+    paddingBottom: 100,
   }
 });

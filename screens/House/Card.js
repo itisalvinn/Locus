@@ -18,7 +18,7 @@ export class Members extends React.Component {
             style={styles.memberName}
             key={`member-${firstName}-${i}`}>
               <Text
-              style={styles.memberText} category='s1'>
+              style={styles.memberText} category='s2'>
                 {firstName}
               </Text>
             </View>
@@ -28,16 +28,21 @@ export class Members extends React.Component {
       );
     }
 
-    return membersArr.map((firstName, i) => (
+    return (
+      <View style={styles.noWrapMembersWrapper}>
+        {membersArr.map((firstName, i) => (
           <View
-          style={styles.expandedMemberName}
+          style={{...styles.memberName, ...styles.expandedMemberName}}
+          // style={styles.expandedMemberName}
           key={`member-${firstName}-${i}`}>
-            <Text category='s1'>
-              {firstName}
-            </Text>
+            <Text category='s2'>
+                {firstName}
+              </Text>
           </View>
           )
-        );
+        )}
+      </View>
+    );
   }
 }
 
@@ -73,10 +78,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 15,
     shadowColor: '#000',
-   shadowOffset: { width: 0, height: 2 },
-   shadowOpacity: 0.2,
-   shadowRadius: 3,
-   elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   membersWrapper: {
     paddingTop: 10,
@@ -84,13 +89,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
+  noWrapMembersWrapper: {
+    paddingTop: 10,
+    display: 'flex',
+    width: "100%",
+  },
   memberName: {
     backgroundColor: '#ffffff',
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     paddingVertical: 3,
-    borderRadius: 50,
-    borderColor: '#98d1b7',
-    backgroundColor: '#73c39c',
+    borderRadius: 5,
+    borderColor: '#598bff',
+    backgroundColor: '#131700',
     borderWidth: 2,
     marginRight: 5,
   },
@@ -98,7 +108,8 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   expandedMemberName: {
-    borderBottomColor: "#eee",
-    borderBottomWidth: 1,
+    padding: 10,
+    backgroundColor: "#fff",
+    marginTop: 5,
   },
 });

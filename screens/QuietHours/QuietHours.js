@@ -2,6 +2,7 @@ import * as React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Layout, Text} from 'react-native-ui-kitten';
 import TimePickerModal from './TimePickerModal';
+import Constants from 'expo-constants';
 
 export default class TodoList extends React.Component {
   state = {
@@ -145,6 +146,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
+    paddingTop: Constants.statusBarHeight,
   },
   content: {
     flex: 1,
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 10,
   },
   memberName: {
     paddingHorizontal: 15,

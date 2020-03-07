@@ -146,9 +146,11 @@ class DashboardScreen extends Component {
     const {inviteCodes, houseInfo} = this.state;
       for (let inviteCode in inviteCodes) {
         if (inviteCodes[inviteCode] === houseUuid) {
+          console.log({inviteCode});
           return inviteCode;
         }
     }
+    console.log("Returning null invite code");
     return null;
   }
   joinHouseFromInvite = (inviteCode) => {
@@ -554,6 +556,8 @@ class DashboardScreen extends Component {
             createNewHouse={this.createNewHouse}
             houses={this.state.houses}
             createInviteCode={this.createInviteCode}
+            joinHouseFromInvite={this.joinHouseFromInvite}
+            isValidInviteCode={this.isValidInviteCode}
           />
         );
       case 1:
