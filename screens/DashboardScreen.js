@@ -69,6 +69,10 @@ class DashboardScreen extends Component {
       context: this,
       state: "inviteCodes"
     });
+    this.housesRef = base.syncState(`houses`, {
+      context: this,
+      state: "houses"
+    });
   }
 
   synchronizeHouseStatesWithFirebase(houseUuid) {
@@ -84,10 +88,6 @@ class DashboardScreen extends Component {
       context: this,
       state: "groceryItemKeys"
     });
-    this.housesRef = base.syncState(`houses`, {
-      context: this,
-      state: "houses"
-    });
   }
 
   removeBindingFromFirebase() {
@@ -95,13 +95,13 @@ class DashboardScreen extends Component {
     base.removeBinding(this.itemKeysRef);
     base.removeBinding(this.userRef);
     base.removeBinding(this.inviteCodesRef);
+    base.removeBinding(this.housesRef);
   }
 
   removeHouseBindingFromFirebase() {
     base.removeBinding(this.houseInfoRef);
     base.removeBinding(this.groceryItemsRef);
     base.removeBinding(this.groceryItemKeysRef);
-    base.removeBinding(this.housesRef);
   }
 
   /* Join/Invite a house */
@@ -146,11 +146,10 @@ class DashboardScreen extends Component {
     const {inviteCodes, houseInfo} = this.state;
       for (let inviteCode in inviteCodes) {
         if (inviteCodes[inviteCode] === houseUuid) {
-          console.log("Got an invite code!!!", inviteCode);
           return inviteCode;
         }
     }
-    return this.createInviteCode(houseUuid);
+    return null;
   }
   joinHouseFromInvite = (inviteCode) => {
     const houseUuid = this.state.inviteCodes[inviteCode];
@@ -169,6 +168,7 @@ class DashboardScreen extends Component {
   createNewHouse = () => {
     const { houses } = this.state;
     const houseUuid = this.generateUIDWithCollisionChecking(houses);
+    this.createInviteCode(houseUuid);
     return houseUuid;
   }
 
@@ -447,8 +447,8 @@ class DashboardScreen extends Component {
         if (!validMembersLen) {
           // House has no member
           houseInfo = null;
+          this.removeInviteCode(this.getInviteCode(houseUuid));
         }
-        console.log({houseInfo, user});
         this.setState({houseInfo, user});
 
         // 5. Redirect to the new houseUuid
@@ -552,6 +552,8 @@ class DashboardScreen extends Component {
             houseInfo={this.state.houseInfo}
             getInviteCode={this.getInviteCode}
             createNewHouse={this.createNewHouse}
+            houses={this.state.houses}
+            createInviteCode={this.createInviteCode}
           />
         );
       case 1:
