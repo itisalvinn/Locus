@@ -66,8 +66,7 @@ export default class House extends React.Component {
     })
   }
 
-  joinHouse = () => {
-    const inviteCode = this.refs.joinHouse.textInputRef.current._lastNativeText;
+  joinHouse = (inviteCode) => {
     const isValidCode = this.props.isValidInviteCode(inviteCode);
     if (isValidCode) {
       // Valid code
