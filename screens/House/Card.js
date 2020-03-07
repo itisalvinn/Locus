@@ -1,50 +1,82 @@
 import * as React from 'react';
-import { StyleSheet, View, Picker, ScrollView} from 'react-native';
+import { StyleSheet, View, Picker, ScrollView, TouchableOpacity} from 'react-native';
 import { Layout, Text, Button, Input} from 'react-native-ui-kitten';
 
 export class Members extends React.Component {
   render() {
-    const {members = {}} = this.props;
+    const {members = {}, expand} = this.props;
     const membersArr = (Object.keys(members))
     .map(k => members[k])
     .sort((a, b) => a - b);
-    return (
-      <ScrollView
-      style={styles.membersWrapper}
-      horizontal>
-        {membersArr.map((firstName, i) => (
+    if (!expand) {
+      return (
+        <ScrollView
+        style={styles.membersWrapper}
+        horizontal>
+          {membersArr.map((firstName, i) => (
+            <View
+            style={styles.memberName}
+            key={`member-${firstName}-${i}`}>
+              <Text
+              style={styles.memberText} category='s1'>
+                {firstName}
+              </Text>
+            </View>
+            )
+          )}
+        </ScrollView>
+      );
+    }
+
+    return membersArr.map((firstName, i) => (
           <View
-          style={styles.memberName}
+          style={styles.expandedMemberName}
           key={`member-${firstName}-${i}`}>
-            <Text
-            style={styles.memberText} category='s1'>
+            <Text category='s1'>
               {firstName}
             </Text>
           </View>
           )
-        )}
-      </ScrollView>
-    );
+        );
   }
 }
 
 export default class Card extends React.Component {
+  state = {
+    expand: false,
+  }
+
+  onCardPress = () => {
+    const {expand} = this.state;
+    this.setState({
+      expand: !expand,
+    });
+
+    this.props.onCardPress();
+  }
+
   render() {
-  return (
-    <View style={styles.wrapper}>
-      <Text category='h6'>Members</Text>
-      <Members members={this.props.houseInfo.members} />
-    </View>
-  );
+    const {expand} = this.state;
+    return (
+      <TouchableOpacity onPress={this.onCardPress}>
+        <Layout level='2' style={styles.wrapper}>
+          <Text category='h6'>Members</Text>
+          <Members members={this.props.houseInfo.members} expand={expand} />
+        </Layout>
+      </TouchableOpacity>
+    );
   }
 }
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '90%',
     padding: 20,
-    backgroundColor: '#f4f4f6',
     borderRadius: 15,
+    shadowColor: '#000',
+   shadowOffset: { width: 0, height: 2 },
+   shadowOpacity: 0.2,
+   shadowRadius: 3,
+   elevation: 2,
   },
   membersWrapper: {
     paddingTop: 10,
@@ -64,5 +96,9 @@ const styles = StyleSheet.create({
   },
   memberText: {
     color: '#ffffff',
-  }
+  },
+  expandedMemberName: {
+    borderBottomColor: "#eee",
+    borderBottomWidth: 1,
+  },
 });
