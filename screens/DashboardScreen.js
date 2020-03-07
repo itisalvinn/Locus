@@ -594,6 +594,7 @@ class DashboardScreen extends Component {
           <Settings
             key='settings'
             user={this.state.user}
+            houses={this.state.houses}
           />
         );
       /* remove for now
@@ -673,7 +674,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'pink',
   },
   content: {
     width: '100%',

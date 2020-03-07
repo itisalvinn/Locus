@@ -22,6 +22,11 @@ export default class Settings extends React.Component {
     authSignOut(this.onSuccess, this.onError);
   }
 
+  renderHouseNames = () => {
+    const {user, houses} = this.props;
+    return Object.keys(user.houses).map(houseUuid => houses[houseUuid].name || houseUuid).join(", ");
+  }
+
   render() {
     return (
       <Layout style={styles.container}>
@@ -51,7 +56,7 @@ export default class Settings extends React.Component {
           <Text style={styles.rowText}> Email {"\n"} {this.props.user.email} </Text>
         </View>
         <View style={styles.listItem}>
-          <Text style={styles.rowText}> Houses {"\n"} {Object.keys(this.props.user.houses).join(", ")} </Text>
+          <Text style={styles.rowText}> Houses {"\n"} {this.renderHouseNames()} </Text>
         </View>
       </Layout>
     );
