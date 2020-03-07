@@ -8,6 +8,7 @@ import Settings from './Settings/Settings';
 import Grocery from './Grocery/Grocery';
 import { MaterialIcons } from '@expo/vector-icons';
 import {authDetect, base, authSignOut} from '../firebase';
+import Join from './House/Join';
 
 class DashboardScreen extends Component {
   constructor(props) {
@@ -22,6 +23,8 @@ class DashboardScreen extends Component {
       user: props.navigation.state.params ? props.navigation.state.params.user : null,
       houseUuid: props.navigation.state.params ? props.navigation.state.params.houseUuid : null,
       houseInfo: null,
+      inviteCodes: {},
+      houses: {},
     }
   }
 
@@ -32,8 +35,7 @@ class DashboardScreen extends Component {
     if (this.state.houseUuid) {
       this.synchronizeHouseStatesWithFirebase(this.state.houseUuid)
     } else {
-      // For the demo:
-      this.editHouse('demo-housing', {name: 'Demo Housing'});
+      this.showInviteScreen();
     }
   }
 
@@ -63,6 +65,10 @@ class DashboardScreen extends Component {
       context: this,
       state: "user"
     });
+    this.inviteCodesRef = base.syncState(`invite_codes`, {
+      context: this,
+      state: "inviteCodes"
+    });
   }
 
   synchronizeHouseStatesWithFirebase(houseUuid) {
@@ -78,18 +84,92 @@ class DashboardScreen extends Component {
       context: this,
       state: "groceryItemKeys"
     });
+    this.housesRef = base.syncState(`houses`, {
+      context: this,
+      state: "houses"
+    });
   }
 
   removeBindingFromFirebase() {
     base.removeBinding(this.itemsRef);
     base.removeBinding(this.itemKeysRef);
     base.removeBinding(this.userRef);
+    base.removeBinding(this.inviteCodesRef);
   }
 
   removeHouseBindingFromFirebase() {
     base.removeBinding(this.houseInfoRef);
     base.removeBinding(this.groceryItemsRef);
     base.removeBinding(this.groceryItemKeysRef);
+    base.removeBinding(this.housesRef);
+  }
+
+  /* Join/Invite a house */
+  /* =============================== */
+  showInviteScreen = () => {
+    this.setState({
+      showInviteScreen: true
+    });
+  }
+  isValidInviteCode = (inviteCode) => {
+    const {inviteCodes} = this.state;
+    console.log({inviteCodes, inviteCode});
+    if (!inviteCodes[inviteCode]) {
+      this.createInviteCode("demo-housing");
+      return false;
+    } else {
+      return true;
+    }
+  }
+  generateUIDWithCollisionChecking = (obj) => {
+    while (true) {
+        var uid = ("0000" + ((Math.random() * Math.pow(36, 6)) | 0).toString(36)).slice(-6);
+        if (!obj.hasOwnProperty(uid)) {
+            return uid;
+        }
+    }
+  }
+  createInviteCode = (houseUuid) => {
+    const {inviteCodes} = this.state;
+    const generatedInviteCode = this.generateUIDWithCollisionChecking(inviteCodes);
+    console.log({generatedInviteCode});
+    this.setState({
+      inviteCodes: {
+        ...inviteCodes,
+        [generatedInviteCode]: houseUuid,
+      },
+    });
+    console.log({generatedInviteCode});
+    return generatedInviteCode;
+  }
+  getInviteCode = (houseUuid) => {
+    const {inviteCodes, houseInfo} = this.state;
+      for (let inviteCode in inviteCodes) {
+        if (inviteCodes[inviteCode] === houseUuid) {
+          console.log("Got an invite code!!!", inviteCode);
+          return inviteCode;
+        }
+    }
+    return this.createInviteCode(houseUuid);
+  }
+  joinHouseFromInvite = (inviteCode) => {
+    const houseUuid = this.state.inviteCodes[inviteCode];
+    this.editHouse(houseUuid);
+    // this.removeInviteCode(inviteCode);
+  }
+  removeInviteCode = (inviteCode) => {
+    const {inviteCodes} = this.state;
+    this.setState({
+      inviteCodes: {
+        ...inviteCodes,
+        [inviteCode]: null,
+      },
+    })
+  }
+  createNewHouse = () => {
+    const { houses } = this.state;
+    const houseUuid = this.generateUIDWithCollisionChecking(houses);
+    return houseUuid;
   }
 
   /* Grocery List */
@@ -277,6 +357,7 @@ class DashboardScreen extends Component {
           [houseUuid]: Date.now()
         }
       };
+      console.log({newHouseInfo});
       houseInfo = {
         ...newHouseInfo,
         members: {
@@ -285,43 +366,43 @@ class DashboardScreen extends Component {
         },
       };
       this.setState({houseInfo, user, houseUuid});
-    })
+    }).catch(error => {
+      console.log("[editHouse] ", error);
+    });
 
-    // 2. Update the current state with new houseUuid
-    base
-      .fetch(`houses/${houseUuid}`, {
-        context: this,
-      })
-      .then(data => {
-        this.setState({
-          houseInfo: data
-        });
+    // // 2. Update the current state with new houseUuid
+    // base
+    //   .fetch(`houses/${houseUuid}`, {
+    //     context: this,
+    //   })
+    //   .then(data => {
+    //     this.setState({
+    //       houseInfo: data,
+    //     });
 
-        // 3. Synchronize with new houseUuid
-        this.synchronizeHouseStatesWithFirebase(houseUuid);
+    //     // 3. Synchronize with new houseUuid
+    //     this.synchronizeHouseStatesWithFirebase(houseUuid);
 
-        let {user, houseInfo, uid, groceryItems} = this.state;
-        let {members = {}} = houseInfo;
-        let {participants = {}} = groceryItems;
-        user = {
-          ...user,
-          houses: {
-            ...user.houses,
-            [houseUuid]: Date.now()
-          }
-        };
-        houseInfo = {
-          ...newHouseInfo,
-          members: {
-            ...members,
-            [uid]: user.first_name
-          },
-        };
-        this.setState({houseInfo, user, houseUuid});
-      })
-      .catch(error => {
-        console.log("[editHouse] ", error);
-      });
+    //     let {user, houseInfo, uid, groceryItems} = this.state;
+    //     let {members = {}} = houseInfo;
+    //     let {participants = {}} = groceryItems;
+    //     user = {
+    //       ...user,
+    //       houses: {
+    //         ...user.houses,
+    //         [houseUuid]: Date.now()
+    //       }
+    //     };
+    //     houseInfo = {
+    //       ...newHouseInfo,
+    //       members: {
+    //         ...members,
+    //         [uid]: user.first_name
+    //       },
+    //     };
+    //     this.setState({houseInfo, user, houseUuid});
+    //   })
+      
   }
 
   leaveHouse = (houseUuid) => {
@@ -367,14 +448,24 @@ class DashboardScreen extends Component {
           // House has no member
           houseInfo = null;
         }
+        console.log({houseInfo, user});
         this.setState({houseInfo, user});
 
         // 5. Redirect to the new houseUuid
         const newHouseUuid = this.getNewLastHouse(oldHouseUuid);
-        if (newHouseUuid) {
-          if (this.houseInfoRef) {
-            this.removeHouseBindingFromFirebase();
-          }
+        if (this.houseInfoRef) {
+          this.removeHouseBindingFromFirebase();
+        }
+        if (!newHouseUuid) {
+          // User does not have any other house :(
+          // Show the invite screen
+          this.setState({
+            houseUuid: null,
+          });
+        } else {
+          // if (this.houseInfoRef) {
+          //   this.removeHouseBindingFromFirebase();
+          // }
 
           base
             .fetch(`houses/${newHouseUuid}`, {
@@ -442,6 +533,15 @@ class DashboardScreen extends Component {
     const {selectedIndex} = this.state;
     switch (selectedIndex) {
       case 0:
+        if (!this.state.houseUuid) {
+          return (
+            <Join
+              isValidInviteCode={this.isValidInviteCode}
+              editHouse={this.editHouse}
+              joinHouseFromInvite={this.joinHouseFromInvite}
+            />
+          );
+        }
         return (
           <House
             uid={this.state.uid}
@@ -450,6 +550,8 @@ class DashboardScreen extends Component {
             leaveHouse={this.leaveHouse}
             houseUuid={this.state.houseUuid}
             houseInfo={this.state.houseInfo}
+            getInviteCode={this.getInviteCode}
+            createNewHouse={this.createNewHouse}
           />
         );
       case 1:
@@ -480,6 +582,7 @@ class DashboardScreen extends Component {
       case 3:
         return (
           <QuietHours
+            key='quietHours'
             uid={this.state.uid}
             user={this.state.user}
             houseUuid={this.state.houseUuid}
@@ -489,7 +592,7 @@ class DashboardScreen extends Component {
       case 4:
         return (
           <Settings
-            key='3'
+            key='settings'
             user={this.state.user}
           />
         );
@@ -527,6 +630,9 @@ class DashboardScreen extends Component {
 
     return (
       <View style={styles.container}>
+      <View style={styles.content}>
+        {this.renderSelectedPage()}
+      </View>
       <View
         style={styles.bottomNav}>
         <BottomNavigation
@@ -542,9 +648,6 @@ class DashboardScreen extends Component {
           {/* <BottomNavigationTab title='Logout'/> */}
         </BottomNavigation>
       </View>
-        <View style={styles.content}>
-          {this.renderSelectedPage()}
-        </View>
       </View>
     )
   }
@@ -554,9 +657,9 @@ export default DashboardScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
   },
   logoutBtn: {
     position: 'absolute',
@@ -565,18 +668,15 @@ const styles = StyleSheet.create({
     left: 0,
   },
   bottomNav: {
-    flex: 1,
-    justifyContent: 'center',
-    position: 'absolute',
+    justifyContent: 'flex-start',
     height: Platform.OS === 'ios' ? 70 : 50,
     bottom: 0,
     left: 0,
     right: 0,
+    backgroundColor: 'pink',
   },
   content: {
     width: '100%',
     flex: 1,
-    position: 'relative',
-    marginBottom: 50, // must be same as height of bottomNav
   }
 });
