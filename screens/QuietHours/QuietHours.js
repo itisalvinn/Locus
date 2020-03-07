@@ -103,7 +103,7 @@ export default class TodoList extends React.Component {
           })
           .map((entry) => {
             return (
-              <View style={styles.houseHoursContainer}>
+              <View key={entry[0]} style={styles.houseHoursContainer}>
                 <View style={styles.memberName}>
                   <Text style={styles.memberText}>User: {members[entry[0]]}</Text>
                 </View>

@@ -19,29 +19,24 @@ export default class TimePickerModal extends Component {
     } else if (this.props.timeSelector === 'weekend') {
       this.buttonText = 'Set weekend quiet hours';
     }
-
-    this.setTime = this.setTime.bind(this);
-  }
-
-  setTime(newDate) {
-    this.setState({time: newDate});
   }
 
   setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
 
-  handleTimeSubmission = () => {
+  handleTimeSubmission = (date) => {
     console.log("Setting quiet hours in firebase.")
 
     const dataRef = 'houses/' + this.props.houseUuid + '/quiet_hours/' +
       this.props.uid;
 
+    const dateToSave = date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})
     console.log('Reference is at: ', dataRef);
-    console.log('Time to save is:', this.state.time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}));
+    console.log('Time to save is:', dateToSave);
 
     let quietHours = {};
-    quietHours[this.props.timeSelector] = this.state.time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    quietHours[this.props.timeSelector] = dateToSave;
 
     firebase
       .database()
@@ -82,47 +77,24 @@ export default class TimePickerModal extends Component {
   render() {
     return (
       <View>
-        {/*<Modal*/}
-        {/*  style={styles.modal}*/}
-        {/*  animationType="slide"*/}
-        {/*  transparent={true}*/}
-        {/*  visible={this.state.modalVisible}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*    Alert.alert('Modal has been closed.');*/}
-        {/*  }}>*/}
-        {/*  <View style={styles.modalView}>*/}
-            <DateTimePickerModal
-              isVisible={this.state.modalVisible}
-              mode="time"
-              onConfirm={this.handleTimeSubmission}
-              onCancel={() => {this.setModalVisible(!this.state.modalVisible)}}
-            />
-            {/*<DatePickerIOS*/}
-            {/*  date={this.state.time}*/}
-            {/*  onDateChange={this.setTime}*/}
-            {/*  mode={'time'}*/}
-            {/*  // initialDate={something}*/}
-            {/*/>*/}
-            {/*<Button onPress={this.handleTimeSubmission}>*/}
-            {/*  Set Hours*/}
-            {/*</Button>*/}
-            {/*<Button onPress={() => {*/}
-            {/*  this.setModalVisible(!this.state.modalVisible);*/}
-            {/*}}>*/}
-            {/*  Cancel*/}
-            {/*</Button>*/}
-            {this.props.edit &&
-            (
-              <Button
-                status={'danger'}
-                onPress={this.handleRemoveTime}
-              >
-                Delete Hours
-              </Button>
-            )
-            }
-        {/*  </View>*/}
-        {/*</Modal>*/}
+        <DateTimePickerModal
+          isVisible={this.state.modalVisible}
+          mode="time"
+          onConfirm={this.handleTimeSubmission}
+          onCancel={() => {
+            this.setModalVisible(!this.state.modalVisible)
+          }}
+        />
+        {this.props.edit &&
+        (
+          <Button
+            status={'danger'}
+            onPress={this.handleRemoveTime}
+          >
+            Delete Hours
+          </Button>
+        )
+        }
         <View style={styles.container}>
           <Button
             appearance='outline'
@@ -146,22 +118,5 @@ const styles = StyleSheet.create({
     // width: '80%',
     paddingBottom: 10,
     flexDirection: 'row'
-  },
-  modal: {
-    // justifyContent: 'flex-start',
-    // backgroundColor: 'black',
-    // alignItem: 'center'
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    height: '10%'
-  },
-  modalView: {
-    backgroundColor: 'white',
-    width: '95%',
-    // height: '80%',
-    alignSelf: 'flex-start',
-    // top: '15%',
-    // borderRadius: '3%',
   }
 });
