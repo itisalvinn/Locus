@@ -82,20 +82,20 @@ export default class TimePickerModal extends Component {
   render() {
     return (
       <View>
-        <Modal
-          style={styles.modal}
-          animationType="slide"
-          transparent={true}
-          visible={this.state.modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}>
-          <View style={styles.modalView}>
+        {/*<Modal*/}
+        {/*  style={styles.modal}*/}
+        {/*  animationType="slide"*/}
+        {/*  transparent={true}*/}
+        {/*  visible={this.state.modalVisible}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*    Alert.alert('Modal has been closed.');*/}
+        {/*  }}>*/}
+        {/*  <View style={styles.modalView}>*/}
             <DateTimePickerModal
               isVisible={this.state.modalVisible}
               mode="time"
               onConfirm={this.handleTimeSubmission}
-              onCancel={this.setModalVisible(!this.state.modalVisible)}
+              onCancel={() => {this.setModalVisible(!this.state.modalVisible)}}
             />
             {/*<DatePickerIOS*/}
             {/*  date={this.state.time}*/}
@@ -103,14 +103,14 @@ export default class TimePickerModal extends Component {
             {/*  mode={'time'}*/}
             {/*  // initialDate={something}*/}
             {/*/>*/}
-            <Button onPress={this.handleTimeSubmission}>
-              Set Hours
-            </Button>
-            <Button onPress={() => {
-              this.setModalVisible(!this.state.modalVisible);
-            }}>
-              Cancel
-            </Button>
+            {/*<Button onPress={this.handleTimeSubmission}>*/}
+            {/*  Set Hours*/}
+            {/*</Button>*/}
+            {/*<Button onPress={() => {*/}
+            {/*  this.setModalVisible(!this.state.modalVisible);*/}
+            {/*}}>*/}
+            {/*  Cancel*/}
+            {/*</Button>*/}
             {this.props.edit &&
             (
               <Button
@@ -121,8 +121,8 @@ export default class TimePickerModal extends Component {
               </Button>
             )
             }
-          </View>
-        </Modal>
+        {/*  </View>*/}
+        {/*</Modal>*/}
         <View style={styles.container}>
           <Button
             appearance='outline'
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     width: '95%',
     // height: '80%',
     alignSelf: 'flex-start',
-    top: '15%',
-    borderRadius: '3%',
+    // top: '15%',
+    // borderRadius: '3%',
   }
 });
