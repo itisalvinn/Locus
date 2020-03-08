@@ -26,6 +26,7 @@ export default class TimePickerModal extends Component {
   }
 
   handleTimeSubmission = (date) => {
+    this.setModalVisible(false);
     console.log("Setting quiet hours in firebase.")
 
     const dataRef = 'houses/' + this.props.houseUuid + '/quiet_hours/' +
@@ -42,14 +43,12 @@ export default class TimePickerModal extends Component {
       .database()
       .ref(dataRef)
       .update(quietHours)
-      .then(function (snapshot) {
+      .then(() => {
         console.log('Saved quiet hours in firebase.');
       })
       .catch((error) => {
         console.log(error);
       });
-
-    this.setModalVisible(!this.state.modalVisible);
   }
 
   handleRemoveTime = () => {
@@ -71,18 +70,21 @@ export default class TimePickerModal extends Component {
         console.log(error);
       });
 
-    this.setModalVisible(!this.state.modalVisible);
+    this.setModalVisible(false);
   }
 
   render() {
+    console.log(this.state);
+    const {modalVisible} = this.state;
     return (
       <View>
         <DateTimePickerModal
-          isVisible={this.state.modalVisible}
+          isVisible={modalVisible}
           mode="time"
           onConfirm={this.handleTimeSubmission}
+          timePickerModeAndroid="spinner"
           onCancel={() => {
-            this.setModalVisible(!this.state.modalVisible)
+            this.setModalVisible(false)
           }}
         />
         {this.props.edit &&

@@ -212,7 +212,7 @@ export default class House extends React.Component {
         <Layout
           level='2'
           style={styles.modalContainer}>
-            <Text category='s1'>Are you sure you want to leave <Text status='primary'>{this.props.houseInfo.name}?</Text></Text>
+            <Text category='s1'>Are you sure you want to leave <Text status='primary'>{this.props.houseInfo ? this.props.houseInfo.name : ''}?</Text></Text>
               <Layout style={styles.btnContainer} level='2'>
             <Button status='danger' onPress={this.hideLeaveModal} style={styles.leftBtn}>
               Cancel

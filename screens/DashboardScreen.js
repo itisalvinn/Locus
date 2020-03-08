@@ -641,21 +641,35 @@ class DashboardScreen extends Component {
       <View style={styles.content}>
         {this.renderSelectedPage()}
       </View>
-      <View
-        style={this.state.houseUuid ? styles.bottomNav : styles.hideBottomNav}>
+      {!Boolean(this.state.houseUuid) ? (
+        <View
+        style={styles.bottomNav}>
         <BottomNavigation
-          indicatorStyle={styles.indicator}
           selectedIndex={this.state.selectedIndex}
           onSelect={this.onSelect}>
           <BottomNavigationTab title='Home'/>
           <BottomNavigationTab title='To Do List'/>
-          <BottomNavigationTab title='Grocery List'/>
-          <BottomNavigationTab title='Quiet Hours'/>
           <BottomNavigationTab title='Settings'/>
           {/* Below is temporary */}
           {/* <BottomNavigationTab title='Logout'/> */}
         </BottomNavigation>
       </View>
+      ) : (
+        <View
+        style={styles.bottomNav}>
+          <BottomNavigation
+            selectedIndex={this.state.selectedIndex}
+            onSelect={this.onSelect}>
+            <BottomNavigationTab title='Home'/>
+            <BottomNavigationTab title='To Do List'/>
+            <BottomNavigationTab title='Grocery List'/>
+            <BottomNavigationTab title='Quiet Hours'/>
+            <BottomNavigationTab title='Settings'/>
+            {/* Below is temporary */}
+            {/* <BottomNavigationTab title='Logout'/> */}
+          </BottomNavigation>
+        </View>
+      )}
       </View>
     )
   }
