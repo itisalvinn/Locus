@@ -531,6 +531,31 @@ class DashboardScreen extends Component {
     return houseUuid;
   }
 
+  renderSecondNav() {
+    if (!Boolean(this.state.houseUuid)) {
+      return (
+        <Settings
+          key='settings'
+          user={this.state.user}
+          houses={this.state.houses}
+        />
+      );
+    }
+    return (
+      <Grocery
+        groceryItems={this.state.groceryItems}
+        groceryItemKeys={this.state.groceryItemKeys}
+        deleteGroceryItem={this.deleteGroceryItem}
+        editGroceryItem={this.editGroceryItem}
+        addGroceryItem={this.addGroceryItem}
+        toggleGroceryItemComplete={this.toggleGroceryItemComplete}
+        participateInItem={this.participateInItem}
+        unparticipateInItem={this.unparticipateInItem}
+        uid={this.state.uid}
+      />
+    );
+  }
+
   renderSelectedPage() {
     const {selectedIndex} = this.state;
     switch (selectedIndex) {
@@ -573,19 +598,7 @@ class DashboardScreen extends Component {
           />
         );
       case 2:
-        return (
-          <Grocery
-            groceryItems={this.state.groceryItems}
-            groceryItemKeys={this.state.groceryItemKeys}
-            deleteGroceryItem={this.deleteGroceryItem}
-            editGroceryItem={this.editGroceryItem}
-            addGroceryItem={this.addGroceryItem}
-            toggleGroceryItemComplete={this.toggleGroceryItemComplete}
-            participateInItem={this.participateInItem}
-            unparticipateInItem={this.unparticipateInItem}
-            uid={this.state.uid}
-          />
-        )
+        return this.renderSecondNav();
       case 3:
         return (
           <QuietHours

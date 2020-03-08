@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { mapping, light as lightTheme } from '@eva-design/eva';
+import { mapping, dark as darkTheme, light as lightTheme } from '@eva-design/eva';
 import { ApplicationProvider } from 'react-native-ui-kitten';
 import { StatusBar } from 'react-native';
 
