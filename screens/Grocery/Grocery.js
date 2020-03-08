@@ -13,6 +13,7 @@ export default class Grocery extends React.Component {
     addClicked: false,
     editClicked: false,
     editItemKey: null,
+    showCompleted: false,
   }
 
   rows = {};
@@ -107,8 +108,26 @@ export default class Grocery extends React.Component {
     this.onCloseModalPress();
   }
 
+  onCompletePress = () => {
+    this.setState({showCompleted: true});
+    Object.keys(this.rows).forEach(row => {
+      this.rows[row] && this.rows[row].close();
+    });
+  }
+
+  onActivePress = () => {
+    this.setState({showCompleted: false});
+    Object.keys(this.rows).forEach(row => {
+      this.rows[row] && this.rows[row].close();
+    });
+  }
+
   renderItem = (info) => {
-    if (!this.props.groceryItemKeys || !this.props.groceryItemKeys.length) return null;
+    if (info.item === "empty" || !this.props.groceryItemKeys || !this.props.groceryItemKeys.length) {
+      return (
+        <View style={styles.lastListItem} />
+      )
+    }
     const checkedItem = this.props.groceryItems[info.item];
     const lastItem = info.item === this.props.groceryItemKeys[this.props.groceryItemKeys.length - 1];
 
@@ -119,7 +138,7 @@ export default class Grocery extends React.Component {
       <Swipeable
       ref={(row) => this.rows[info.item] = row}
       renderRightActions={() => this.swipeRightAction(info.item)}>
-        <View style={[styles.listItem, lastItem ? styles.lastListItem : null]}>
+        <View style={styles.listItem}>
         <CheckBox
           disabled={!isParticipating}
           checked={checkedItem.completed}
@@ -127,12 +146,12 @@ export default class Grocery extends React.Component {
           onChange={(checked) => this.toggleItemComplete(info.item)}
         />
         <TouchableOpacity style={styles.todoRow} onPress={() => this.onEditPress(info.item)}>
-          <View>
+          <>
             <Text style={[styles.rowText, checkedItem.completed ? styles.checkedText : styles.radioText]}>
               {checkedItem.title}
             </Text>
-            <Members members={checkedItem.participants} />
-          </View>
+            <Members scrollable={false} members={checkedItem.participants} />
+          </>
         </TouchableOpacity>
       </View>
       </Swipeable>
@@ -171,10 +190,15 @@ export default class Grocery extends React.Component {
   }
 
   render() {
+    const {showCompleted} = this.state;
+    const itemKeys = this.props.groceryItemKeys && this.props.groceryItemKeys.length ? (
+      showCompleted ? this.props.groceryItemKeys.filter(key => Boolean(this.props.groceryItems[key].completed)) : this.props.groceryItemKeys.filter(key => !Boolean(this.props.groceryItems[key].completed))
+    ) : [];
     return (
     <Layout style={styles.container}>
       <Layout style={styles.header}>
         <Text style={styles.text} category='h5'>Grocery List</Text>
+        <Button appearance='ghost' onPress={showCompleted ? this.onActivePress : this.onCompletePress}>{showCompleted ? "Active" : "Completed"}</Button>
         <View style={styles.editBtnWrapper}>
           {/* <Button
           style={styles.editBtn}
@@ -188,12 +212,12 @@ export default class Grocery extends React.Component {
 
       <Layout style={styles.content}>
         <List
-          data={this.props.groceryItemKeys && this.props.groceryItemKeys.length ? this.props.groceryItemKeys : []}
+          data={[...itemKeys, "empty"]}
           renderItem={this.renderItem}
           style={styles.listContainer}
         />
 
-        <View style={styles.btnWrapper}>
+      <View style={styles.btnWrapper}>
           <Button
             style={styles.addBtn}
             textStyle={styles.btnText}
@@ -239,7 +263,6 @@ const styles = StyleSheet.create({
   listItem: {
     borderBottomColor: '#f4f4f6',
     borderBottomWidth: 1,
-    height: 105,
     position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
@@ -300,7 +323,7 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   lastIconBtnContainer: {
-    height: 105,
+    // marginBottom: 80,
   },
   iconBtnContainer: {
     backgroundColor: 'red',

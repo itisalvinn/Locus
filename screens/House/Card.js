@@ -4,11 +4,11 @@ import { Layout, Text, Button, Input} from 'react-native-ui-kitten';
 
 export class Members extends React.Component {
   render() {
-    const {members = {}, expand} = this.props;
+    const {members = {}, expand, scrollable = true} = this.props;
     const membersArr = (Object.keys(members))
     .map(k => members[k])
     .sort((a, b) => a - b);
-    if (!expand) {
+    if (!expand && scrollable) {
       return (
         <ScrollView
         style={styles.membersWrapper}
@@ -25,6 +25,22 @@ export class Members extends React.Component {
             )
           )}
         </ScrollView>
+      );
+    } else if (!scrollable) {
+      return (
+      <View style={styles.membersWrapper}>
+      {membersArr.map((firstName, i) => (
+        <View
+        style={styles.memberName}
+        key={`member-${firstName}-${i}`}>
+          <Text
+          style={styles.memberText} category='s2'>
+            {firstName}
+          </Text>
+        </View>
+        )
+      )}
+      </View>
       );
     }
 

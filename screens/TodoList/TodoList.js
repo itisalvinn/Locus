@@ -12,6 +12,7 @@ export default class TodoList extends React.Component {
     addClicked: false,
     editClicked: false,
     editItemKey: null,
+    showCompleted: false,
   }
 
   rows = {};
@@ -85,15 +86,33 @@ export default class TodoList extends React.Component {
     );
   }
 
+  onCompletePress = () => {
+    this.setState({showCompleted: true});
+    Object.keys(this.rows).forEach(row => {
+      this.rows[row] && this.rows[row].close();
+    });
+  }
+
+  onActivePress = () => {
+    this.setState({showCompleted: false});
+    Object.keys(this.rows).forEach(row => {
+      this.rows[row] && this.rows[row].close();
+    });
+  }
+
   renderItem = (info) => {
-    if (!this.props.itemKeys || !this.props.itemKeys.length) return null;
+    if (info.item === "empty" || !this.props.itemKeys || !this.props.itemKeys.length) {
+      return (
+        <View style={styles.lastListItem} />
+      )
+    }
     const checkedItem = this.props.items[info.item];
     const lastItem = info.item === this.props.itemKeys[this.props.itemKeys.length - 1];
     return (
       <Swipeable
       ref={(row) => this.rows[info.item] = row}
       renderRightActions={() => this.swipeRightAction(info.item)}>
-        <View style={[styles.listItem, lastItem ? styles.lastListItem : null]}>
+        <View style={styles.listItem}>
         <CheckBox
           checked={checkedItem.completed}
           style={styles.checkbx}
@@ -130,10 +149,15 @@ export default class TodoList extends React.Component {
   }
 
   render() {
+    const {showCompleted} = this.state;
+    const itemKeys = this.props.itemKeys && this.props.itemKeys.length ? (
+      showCompleted ? this.props.itemKeys.filter(key => Boolean(this.props.items[key].completed)) : this.props.itemKeys.filter(key => !Boolean(this.props.items[key].completed))
+     ) : [];
     return (
     <Layout style={styles.container}>
       <Layout style={styles.header}>
-        <Text style={styles.text} category='h5'>Personal Todo List</Text>
+        <Text style={styles.text} category='h5'>Todo List</Text>
+        <Button appearance='ghost' onPress={showCompleted ? this.onActivePress : this.onCompletePress}>{showCompleted ? "Active" : "Completed"}</Button>
         <View style={styles.editBtnWrapper}>
           {/* <Button
           style={styles.editBtn}
@@ -147,7 +171,7 @@ export default class TodoList extends React.Component {
 
       <Layout style={styles.content}>
         <List
-          data={this.props.itemKeys && this.props.itemKeys.length ? this.props.itemKeys : []}
+          data={[...itemKeys, "empty"]}
           renderItem={this.renderItem}
           style={styles.listContainer}
         />
@@ -199,13 +223,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f4f4f6',
     borderBottomWidth: 1,
     backgroundColor: '#ffffff',
-    height: 70,
+    // height: "100%",
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 10,
+    paddingVertical: 5,
   },
   lastListItem: {
-    marginBottom: 80,
+    height: 80,
   },
   checkbx: {
     width: 30,
@@ -263,7 +288,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: 70,
-    height: 70,
+    height: "100%",
   },
   header: {
     flexDirection: 'row',
