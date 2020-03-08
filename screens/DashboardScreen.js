@@ -541,6 +541,7 @@ class DashboardScreen extends Component {
               isValidInviteCode={this.isValidInviteCode}
               editHouse={this.editHouse}
               joinHouseFromInvite={this.joinHouseFromInvite}
+              createNewHouse={this.createNewHouse}
             />
           );
         }
@@ -641,7 +642,7 @@ class DashboardScreen extends Component {
         {this.renderSelectedPage()}
       </View>
       <View
-        style={styles.bottomNav}>
+        style={this.state.houseUuid ? styles.bottomNav : styles.hideBottomNav}>
         <BottomNavigation
           indicatorStyle={styles.indicator}
           selectedIndex={this.state.selectedIndex}
@@ -684,5 +685,8 @@ const styles = StyleSheet.create({
   content: {
     width: '100%',
     flex: 1,
+  },
+  hideBottomNav: {
+    display: 'none',
   }
 });

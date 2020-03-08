@@ -49,6 +49,10 @@ export default class House extends React.Component {
   }
 
   createNewHouse = (houseName) => {
+    if (!houseName || !houseName.length) {
+      this.refs.toast.show("House name needs to be of valid length!");
+      return;
+    }
     const newHouseUuid = this.props.createNewHouse();
     this.props.editHouse(newHouseUuid, {name: houseName});
     this.hideCreateModal();
@@ -102,12 +106,24 @@ export default class House extends React.Component {
     })
   }
 
+  showCardLeaveBtn = () => {
+    this.setState({
+      showLeaveBtn: true
+    });
+  }
+
+  hideCardLeaveBtn = () => {
+    this.setState({
+      showLeaveBtn: false
+    });
+  }
+
   renderHouseNames = () => {
     const {user, houses} = this.props;
     console.log({houses});
     return (
       <Layout style={styles.otherHousesContainer}>
-        {Object.keys(user.houses).map(houseUuid => {
+        {user.houses && Object.keys(user.houses).map(houseUuid => {
           if (houseUuid === this.props.houseUuid) return null;
           return (
             <TouchableOpacity key={houseUuid} onPress={() => this.props.editHouse(houseUuid)}>
@@ -138,7 +154,7 @@ export default class House extends React.Component {
               <Text category='h5' style={styles.currentHouseName}>{this.props.houseInfo.name}</Text>
               <Button onPress={this.showInviteModal} appearance='outline'>Invite Code</Button>
             </View>
-            <Card houseInfo={this.props.houseInfo} onCardPress={this.onCardPress} />
+            <Card houseInfo={this.props.houseInfo} onCardPress={this.onCardPress} resetCardPress={this.hideCardLeaveBtn} />
 
           {showLeaveBtn ? (
             <Button style={styles.leaveBtn} status='danger' onPress={this.showLeaveModal}>Leave</Button>

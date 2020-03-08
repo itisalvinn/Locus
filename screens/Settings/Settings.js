@@ -25,10 +25,11 @@ export default class Settings extends React.Component {
 
   renderHouseNames = () => {
     const {user, houses} = this.props;
-    return Object.keys(user.houses).map(houseUuid => houses[houseUuid].name || houseUuid).join(", ");
+    return user.houses && Object.keys(user.houses).map(houseUuid => houses[houseUuid].name || houseUuid).join(", ");
   }
 
   render() {
+    const {user} = this.props;
     return (
       <Layout style={styles.container}>
         <Layout style={styles.header}>
@@ -56,9 +57,11 @@ export default class Settings extends React.Component {
         <View style={styles.listItem}>
           <Text style={styles.rowText}> Email {"\n"} {this.props.user.email} </Text>
         </View>
-        <View style={styles.listItem}>
-          <Text style={styles.rowText}> Houses {"\n"} {this.renderHouseNames()} </Text>
-        </View>
+        {user.houses ? (
+          <View style={styles.listItem}>
+            <Text style={styles.rowText}> Houses {"\n"} {this.renderHouseNames()} </Text>
+          </View>
+        ) : null}
       </Layout>
     );
   }

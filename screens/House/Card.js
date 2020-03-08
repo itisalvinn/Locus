@@ -51,6 +51,10 @@ export default class Card extends React.Component {
     expand: false,
   }
 
+  onComponentDidMount() {
+    this.props.resetCardPress();
+  }
+
   onCardPress = () => {
     const {expand} = this.state;
     this.setState({
@@ -110,6 +114,7 @@ const styles = StyleSheet.create({
   expandedMemberName: {
     padding: 10,
     backgroundColor: "#fff",
+    borderColor: '#f2f6ff',
     marginTop: 5,
   },
 });
