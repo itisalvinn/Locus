@@ -655,29 +655,27 @@ class DashboardScreen extends Component {
         {this.renderSelectedPage()}
       </View>
       {!Boolean(this.state.houseUuid) ? (
-        <View
-        style={styles.bottomNav}>
+        <View style={styles.bottomNav} key='noHouseBottomNav'>
         <BottomNavigation
           selectedIndex={this.state.selectedIndex}
           onSelect={this.onSelect}>
-          <BottomNavigationTab title='Home'/>
-          <BottomNavigationTab title='To Do List'/>
-          <BottomNavigationTab title='Settings'/>
+          <BottomNavigationTab title='Home' key='1'/>
+          <BottomNavigationTab title='To Do List' key='2'/>
+          <BottomNavigationTab title='Settings' key='3'/>
           {/* Below is temporary */}
           {/* <BottomNavigationTab title='Logout'/> */}
         </BottomNavigation>
       </View>
       ) : (
-        <View
-        style={styles.bottomNav}>
+        <View style={styles.bottomNav} key='bottomNav'>
           <BottomNavigation
             selectedIndex={this.state.selectedIndex}
             onSelect={this.onSelect}>
-            <BottomNavigationTab title='Home'/>
-            <BottomNavigationTab title='To Do List'/>
-            <BottomNavigationTab title='Grocery List'/>
-            <BottomNavigationTab title='Quiet Hours'/>
-            <BottomNavigationTab title='Settings'/>
+            <BottomNavigationTab title='Home' key='4'/>
+            <BottomNavigationTab title='To Do List' key='5'/>
+            <BottomNavigationTab title='Grocery List' key='6'/>
+            <BottomNavigationTab title='Quiet Hours' key='7'/>
+            <BottomNavigationTab title='Settings' key='8'/>
             {/* Below is temporary */}
             {/* <BottomNavigationTab title='Logout'/> */}
           </BottomNavigation>
