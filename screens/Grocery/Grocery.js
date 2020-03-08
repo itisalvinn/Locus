@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, AsyncStorage, View, TouchableOpacity} from 'react-native';
+import { StyleSheet, AsyncStorage, View, TouchableOpacity, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import { Button, Layout, Text, List, ListItem, ListItemProps, ListProps, CheckBox } from 'react-native-ui-kitten';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
@@ -34,6 +34,7 @@ export default class Grocery extends React.Component {
       editClicked: false,
       editItemKey: null,
     });
+    Keyboard.dismiss();
   }
 
   onEditPress = (key) => {
@@ -204,7 +205,9 @@ export default class Grocery extends React.Component {
 
       {this.renderEditModal()}
       {this.state.addClicked || this.state.editClicked ? (
-        <View style={styles.overlay} />
+        <TouchableWithoutFeedback onPress={this.onCloseModalPress} accessible={false}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
       ): null}
     </Layout>
     );
