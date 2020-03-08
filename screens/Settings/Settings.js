@@ -4,6 +4,7 @@ import { Button, Layout, Text, List, ListItem} from 'react-native-ui-kitten';
 import { RectButton } from 'react-native-gesture-handler';
 import { FontAwesome } from '@expo/vector-icons';
 import {authSignOut} from '../../firebase';
+import Constants from 'expo-constants';
 
 export default class Settings extends React.Component {
   state = {
@@ -24,10 +25,11 @@ export default class Settings extends React.Component {
 
   renderHouseNames = () => {
     const {user, houses} = this.props;
-    return Object.keys(user.houses).map(houseUuid => houses[houseUuid].name || houseUuid).join(", ");
+    return user.houses && Object.keys(user.houses).map(houseUuid => houses[houseUuid].name || houseUuid).join(", ");
   }
 
   render() {
+    const {user} = this.props;
     return (
       <Layout style={styles.container}>
         <Layout style={styles.header}>
@@ -55,9 +57,11 @@ export default class Settings extends React.Component {
         <View style={styles.listItem}>
           <Text style={styles.rowText}> Email {"\n"} {this.props.user.email} </Text>
         </View>
-        <View style={styles.listItem}>
-          <Text style={styles.rowText}> Houses {"\n"} {this.renderHouseNames()} </Text>
-        </View>
+        {user.houses ? (
+          <View style={styles.listItem}>
+            <Text style={styles.rowText}> Houses {"\n"} {this.renderHouseNames()} </Text>
+          </View>
+        ) : null}
       </Layout>
     );
   }
@@ -76,6 +80,7 @@ const styles = StyleSheet.create({
     // height: '100%',
     flex: 1,
     position: 'relative',
+    paddingTop: Constants.statusBarHeight,
   },
   content: {
     flex: 1,
@@ -121,7 +126,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 10,
     backgroundColor: 'black',
   },
   logoutBtn: {

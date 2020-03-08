@@ -11,9 +11,7 @@ export default class EditModal extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.autoFocus !== undefined && this.props.autoFocus) {
-      this.input.focus();
-    }
+    this.input.focus();
   }
 
   onInputValueChange = (inputVal) => {
@@ -21,10 +19,6 @@ export default class EditModal extends React.Component {
   }
 
   onSubmit = (inputVal) => {
-    if (this.props.clearOnSubmit !== undefined && !this.props.clearOnSubmit) {
-      this.props.onSubmit(inputVal);
-      return;
-    }
     this.setState({inputVal: ''});
     this.props.onSubmit(inputVal);
   }
@@ -36,7 +30,7 @@ export default class EditModal extends React.Component {
 
   render() {
   return (
-    <KeyboardAvoidingView style={{...styles.container, ...this.props.style}} behavior="padding" enabled>
+    <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
       <View style={styles.header}>
         <Text category='s1' style={styles.txt}>{this.props.title}</Text>
         <Button
@@ -49,11 +43,10 @@ export default class EditModal extends React.Component {
       <Input
         value={this.state.inputVal}
         onChangeText={this.onInputValueChange}
-        placeholder={this.props.placeholder ? this.props.placeholder : 'Item name...'}
+        placeholder='Item name...'
         style={styles.input}
         ref={(input) => this.input = input}
-        autoFocus={this.props.autoFocus !== undefined ? this.props.autoFocus : true}
-        disabled={this.props.disabled !== undefined ? this.props.disabled : false}
+        autoFocus={this.props.autoFocus ? this.props.autoFocus : true}
       />
         <Button
         style={styles.addBtn}

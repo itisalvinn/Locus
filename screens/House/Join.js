@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { StyleSheet, View, Picker} from 'react-native';
+import { StyleSheet, View, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView} from 'react-native';
 import { Layout, Text, Button, Input} from 'react-native-ui-kitten';
+import Constants from 'expo-constants';
 
 export default class Join extends React.Component {
   constructor(props) {
@@ -9,7 +10,8 @@ export default class Join extends React.Component {
       shouldCreateHouse: false,
       inviteCode: null,
       houseName: null,
-      invalidCodeError: null,
+      invalidCodeError: false,
+      invalidHouseNameError: false
     }
   }
 
@@ -42,31 +44,54 @@ export default class Join extends React.Component {
   onHouseNameChange = (text) => {
     this.setState({
       houseName: text,
+      invalidHouseNameError: false,
     });
   }
 
   onInviteCodeChange = (text) => {
     this.setState({
       inviteCode: text,
+      invalidCodeError: false,
     });
   }
 
+  onCreateSubmit = () => {
+    const {houseName} = this.state;
+    if (!houseName || !houseName.length) {
+      this.setState({
+        invalidHouseNameError: true,
+      })
+      return;
+    }
+    this.setState({
+      invalidHouseNameError: false,
+    });
+    const newHouseUuid = this.props.createNewHouse();
+    this.props.editHouse(newHouseUuid, {name: houseName});
+  }
+
   render() {
-    const { shouldCreateHouse, invalidCodeError } = this.state;
+    const { shouldCreateHouse, invalidCodeError, invalidHouseNameError } = this.state;
     return (
-      <View style={styles.container}>
-        <View style={styles.content}>
-          <View style={styles.section}>
+<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Layout style={styles.container}>
+        <Layout style={styles.header}>
+          <Text style={styles.text} category='h2'>{shouldCreateHouse ? "Create a House" : "Join a House"}</Text>
+          </Layout>
+
+    <KeyboardAvoidingView style={styles.content} behavior="padding" enabled>
+        {/* <View style={styles.content}> */}
             <Text style={styles.text}>
               {shouldCreateHouse ? "Please input a house name to create a house:" : "You're currently not in any house! To join a house, please input an invite code below:"}
             </Text>
             {shouldCreateHouse ? (
               <Input
                 style={styles.input}
-                status='primary'
+                status={invalidHouseNameError ? 'danger' : 'primary' }
                 placeholder=''
                 label='House Name'
                 onChangeText={this.onHouseNameChange}
+                caption={invalidHouseNameError ? 'Invalid House Name Length' : null}
               />
             ) : (
               <Input
@@ -81,19 +106,20 @@ export default class Join extends React.Component {
             
             {shouldCreateHouse ? (
               <View style={styles.btnSection}>
-                <Button onPress={this.onInviteCodeSubmit} style={styles.btn}>Create</Button>
-                <Button onPress={this.toggleCreateHouse} style={styles.btn}>Joining a house?</Button>
+                <Button onPress={this.onCreateSubmit} style={styles.btn}>Create</Button>
+                <Button onPress={this.toggleCreateHouse} style={styles.btn}appearance='outline'>Joining a house?</Button>
               </View>
             ) : (
               <View style={styles.btnSection}>
                 <Button onPress={this.onInviteCodeSubmit} style={styles.btn}>Join</Button>
 
-                <Button onPress={this.toggleCreateHouse} style={styles.btn}>Creating a house?</Button>
+                <Button onPress={this.toggleCreateHouse} style={styles.btn} appearance='outline'>Creating a house?</Button>
               </View>
             )}
-          </View>
-        </View>
-      </View>
+        {/* </View> */}
+        </KeyboardAvoidingView>
+      </Layout>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -102,33 +128,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    paddingTop: Constants.statusBarHeight,
   },
   content: {
-    marginTop: 120,
+    justifyContent: 'center',
+    height: "100%",
+    position: "absolute",
+    display: "flex",
+    width: "100%",
   },
   section: {
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 20,
+    width: "100%",
   },
   text: {
     padding: 20,
     paddingBottom: 0,
     marginTop: 20,
-    fontSize: 18,
   },
   input: {
-    margin: 25,
-    marginBottom: 10,
+    margin: 20,
+    marginBottom: 15,
   },
   btn: {
     paddingLeft: 20,
     paddingRight: 20,
-    marginLeft: 5,
-    marginRight: 5,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 10,
   },
   btnSection: {
-    flexDirection: 'row',
+    width: '100%',
   }
 });
