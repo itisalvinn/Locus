@@ -13,7 +13,7 @@ export default class TimePickerModal extends Component {
   constructor(props) {
     super(props);
     if (this.props.edit) {
-      this.buttonText = 'Edit';
+      this.buttonText = '  Edit  ';
     } else if (this.props.timeSelector === 'weekday') {
       this.buttonText = 'Set weekday quiet hours';
     } else if (this.props.timeSelector === 'weekend') {
@@ -26,7 +26,6 @@ export default class TimePickerModal extends Component {
   }
 
   handleTimeSubmission = (date) => {
-    this.setModalVisible(false);
     console.log("Setting quiet hours in firebase.")
 
     const dataRef = 'houses/' + this.props.houseUuid + '/quiet_hours/' +
@@ -43,12 +42,14 @@ export default class TimePickerModal extends Component {
       .database()
       .ref(dataRef)
       .update(quietHours)
-      .then(() => {
+      .then(function (snapshot) {
         console.log('Saved quiet hours in firebase.');
       })
       .catch((error) => {
         console.log(error);
       });
+
+    this.setModalVisible(false);
   }
 
   handleRemoveTime = () => {
@@ -70,21 +71,18 @@ export default class TimePickerModal extends Component {
         console.log(error);
       });
 
-    this.setModalVisible(false);
+    this.setModalVisible(!this.state.modalVisible);
   }
 
   render() {
-    console.log(this.state);
-    const {modalVisible} = this.state;
     return (
       <View>
         <DateTimePickerModal
-          isVisible={modalVisible}
+          isVisible={this.state.modalVisible}
           mode="time"
           onConfirm={this.handleTimeSubmission}
-          timePickerModeAndroid="spinner"
           onCancel={() => {
-            this.setModalVisible(false)
+            this.setModalVisible(!this.state.modalVisible)
           }}
         />
         {this.props.edit &&
@@ -93,7 +91,7 @@ export default class TimePickerModal extends Component {
             status={'danger'}
             onPress={this.handleRemoveTime}
           >
-            Delete Hours
+            Delete
           </Button>
         )
         }
@@ -119,6 +117,8 @@ const styles = StyleSheet.create({
   button: {
     // width: '80%',
     paddingBottom: 10,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginBottom: 10,
+    marginTop: 10,
   }
 });

@@ -6,7 +6,7 @@ import House from './House/House';
 import QuietHours from './QuietHours/QuietHours';
 import Settings from './Settings/Settings';
 import Grocery from './Grocery/Grocery';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import {authDetect, base, authSignOut} from '../firebase';
 import Join from './House/Join';
 
@@ -404,7 +404,7 @@ class DashboardScreen extends Component {
     //     };
     //     this.setState({houseInfo, user, houseUuid});
     //   })
-      
+
   }
 
   leaveHouse = (houseUuid) => {
@@ -649,6 +649,21 @@ class DashboardScreen extends Component {
       )
     }
 
+    const HomeIcon = () =>
+    <MaterialIcons color="black" name="home" size={24} />
+
+    const ToDoIcon = () =>
+    <FontAwesome name="pencil-square-o" size={24} />
+
+    const GroceryIcon = () =>
+    <MaterialIcons color="black" name="local-grocery-store" size={24} />
+
+    const QuietHrsIcon = () =>
+    <MaterialIcons color="black" name="access-time" size={24} />
+
+    const SettingsIcon = () =>
+    <MaterialIcons color="black" name="settings" size={24} />
+
     return (
       <View style={styles.container}>
       <View style={styles.content}>
@@ -659,9 +674,9 @@ class DashboardScreen extends Component {
         <BottomNavigation
           selectedIndex={this.state.selectedIndex}
           onSelect={this.onSelect}>
-          <BottomNavigationTab title='Home' key='1'/>
-          <BottomNavigationTab title='To Do List' key='2'/>
-          <BottomNavigationTab title='Settings' key='3'/>
+          <BottomNavigationTab icon={HomeIcon} key='1'/>
+          <BottomNavigationTab icon={ToDoIcon} key='2'/>
+          <BottomNavigationTab icon={SettingsIcon} key='3'/>
           {/* Below is temporary */}
           {/* <BottomNavigationTab title='Logout'/> */}
         </BottomNavigation>
@@ -671,11 +686,11 @@ class DashboardScreen extends Component {
           <BottomNavigation
             selectedIndex={this.state.selectedIndex}
             onSelect={this.onSelect}>
-            <BottomNavigationTab title='Home' key='4'/>
-            <BottomNavigationTab title='To Do List' key='5'/>
-            <BottomNavigationTab title='Grocery List' key='6'/>
-            <BottomNavigationTab title='Quiet Hours' key='7'/>
-            <BottomNavigationTab title='Settings' key='8'/>
+            <BottomNavigationTab icon={HomeIcon}/>
+            <BottomNavigationTab icon={ToDoIcon}/>
+            <BottomNavigationTab icon={GroceryIcon}/>
+            <BottomNavigationTab icon={QuietHrsIcon}/>
+            <BottomNavigationTab icon={SettingsIcon}/>
             {/* Below is temporary */}
             {/* <BottomNavigationTab title='Logout'/> */}
           </BottomNavigation>

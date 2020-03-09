@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
   text: {
     padding: 20,
     flex: 1,
+    color: 'white',
   },
   listItem: {
     borderBottomColor: '#f4f4f6',
@@ -295,5 +296,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     paddingTop: 10,
+    backgroundColor: 'black',
   },
 });

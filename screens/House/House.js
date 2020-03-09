@@ -87,7 +87,7 @@ export default class House extends React.Component {
       shouldShowLeaveHouse: true,
     });
   }
-  
+
   hideLeaveModal = () => {
     this.setState({
       shouldShowLeaveHouse: false,

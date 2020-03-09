@@ -106,11 +106,11 @@ export default class TodoList extends React.Component {
             return (
               <View key={entry[0]} style={styles.houseHoursContainer}>
                 <View style={styles.memberName}>
-                  <Text style={styles.memberText}>User: {members[entry[0]]}</Text>
+                  <Text numberOfLines={1} style={styles.memberText}> {members[entry[0]]}</Text>
                 </View>
                 <View style={styles.verticalStack}>
-                  <Text >Weekday: {entry[1].weekday}</Text>
-                  <Text >Weekend: {entry[1].weekend}</Text>
+                  <Text > Weekday: {entry[1].weekday}</Text>
+                  <Text > Weekend: {entry[1].weekend}</Text>
                 </View>
               </View>
             );
@@ -125,7 +125,7 @@ export default class TodoList extends React.Component {
     return (
       <Layout style={styles.container}>
         <Layout style={styles.header}>
-          <Text style={styles.text} category='h3'>Quiet Hours</Text>
+          <Text style={styles.headerText} category='h5'>Quiet Hours</Text>
         </Layout>
         {this.renderUserQuietHours()}
         {this.renderHouseQuietHours()}
@@ -156,26 +156,37 @@ const styles = StyleSheet.create({
     // flex: 1,
     flexDirection: 'row'
   },
+  headerText: {
+    padding: 20,
+    // flex: 1,
+    flexDirection: 'row',
+    color: 'white',
+  },
   header: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     paddingTop: 10,
+    backgroundColor: 'black',
   },
   memberName: {
+    width: 120,
     paddingHorizontal: 15,
     paddingVertical: 3,
     borderRadius: 50,
-    borderColor: '#98d1b7',
-    backgroundColor: '#73c39c',
+    borderColor: '#598bff',
+    backgroundColor: '#131700',
     borderWidth: 2,
-    marginRight: 5
+    marginRight: 30,
+    marginLeft: 5,
+    marginTop: 10,
   },
   memberText: {
     color: '#ffffff',
+    alignSelf: 'center'
   },
   verticalStack: {
     flexDirection: 'column',
-    alignSelf: 'flex-end'
+    alignSelf: 'flex-end',
   }
 });
