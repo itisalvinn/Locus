@@ -49,7 +49,7 @@ export default class TodoList extends React.Component {
         to: recipients,
         sound: 'default',
         title: 'Quiet Hours Alert!',
-        body: 'Someone would like you to screeching like a banshee'
+        body: 'Someone would like you to stop screeching like a banshee'
       })
     })
   }

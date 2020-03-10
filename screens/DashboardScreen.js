@@ -41,8 +41,6 @@ class DashboardScreen extends Component {
   }
 
   componentDidMount() {
-    console.log("Dashboard component mounted");
-    console.log(this.state.uid);
     registerForPushNotificationsAsync(this.state.uid);
 
     if (this.state.uid) {
@@ -63,8 +61,8 @@ class DashboardScreen extends Component {
   }
 
   _handleNotification = notification => {
-    console.log('Received a notification...')
-    console.log(notification)
+    console.log('Received a notification...');
+    console.log(notification);
 
     // If they user hits the notification from notification tray
     if (notification.origin == 'selected') {
