@@ -3,9 +3,8 @@ import {Alert, StyleSheet, View} from 'react-native';
 import {Button, Layout, Text} from 'react-native-ui-kitten';
 import TimePickerModal from './TimePickerModal';
 import Constants from 'expo-constants';
-import {Notifications} from 'expo';
 import * as firebase from "firebase";
-import { Vibration } from "react-native";
+import Toast, {DURATION} from "react-native-easy-toast";
 
 export default class TodoList extends React.Component {
   state = {
@@ -52,6 +51,8 @@ export default class TodoList extends React.Component {
         body: 'Someone would like you to stop screeching like a banshee'
       })
     })
+
+    this.refs.toast.show('Alert sent!');
   }
 
   renderTimePicker(timeSelector, edit) {
@@ -177,6 +178,7 @@ export default class TodoList extends React.Component {
         <Layout style={styles.header}>
           <Text style={styles.headerText} category='h5'>Quiet Hours</Text>
         </Layout>
+        <Toast ref="toast" duration={DURATION.LENGTH_SHORT}/>
         {this.renderUserQuietHours()}
         {this.renderHouseQuietHours()}
       </Layout>
