@@ -26,6 +26,7 @@ export default class TimePickerModal extends Component {
   }
 
   handleTimeSubmission = (date) => {
+    this.setModalVisible(false);
     console.log("Setting quiet hours in firebase.")
 
     const dataRef = 'houses/' + this.props.houseUuid + '/quiet_hours/' +
@@ -48,8 +49,6 @@ export default class TimePickerModal extends Component {
       .catch((error) => {
         console.log(error);
       });
-
-    this.setModalVisible(false);
   }
 
   handleRemoveTime = () => {
