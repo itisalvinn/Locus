@@ -20,6 +20,7 @@ import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import {authDetect, base, authSignOut} from '../firebase';
 import Join from './House/Join';
 import {Notifications} from "expo";
+import registerForPushNotificationsAsync from './QuietHours/NotificationRegistration'
 
 class DashboardScreen extends Component {
   constructor(props) {
@@ -40,6 +41,10 @@ class DashboardScreen extends Component {
   }
 
   componentDidMount() {
+    console.log("Dashboard component mounted");
+    console.log(this.state.uid);
+    registerForPushNotificationsAsync(this.state.uid);
+
     if (this.state.uid) {
       this.synchronizeStatesWithFirebase(this.state.uid);
     }
