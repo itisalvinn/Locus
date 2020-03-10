@@ -2,7 +2,7 @@ import React from 'react'
 import {StyleSheet, Text, TextInput, View, Button, Alert, AsyncStorage} from 'react-native'
 import {authSignUp} from "../../firebase";
 import {Input} from 'react-native-ui-kitten';
-import registerForPushNotificationsAsync from "../QuietHours/SilenceYourselfThot";
+import registerForPushNotificationsAsync from "../QuietHours/NotificationRegistration";
 
 
 export default class SignUp extends React.Component {

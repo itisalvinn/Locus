@@ -5,30 +5,14 @@ import TimePickerModal from './TimePickerModal';
 import Constants from 'expo-constants';
 import {Notifications} from 'expo';
 import * as firebase from "firebase";
+import { Vibration } from "react-native";
 
 export default class TodoList extends React.Component {
   state = {
     addClicked: false,
     editClicked: false,
-    editItemKey: null,
-    notifications: {}
+    editItemKey: null
   }
-
-  componentDidMount() {
-    // Handle notifications that are received or selected while the app
-    // is open. If the app was closed and then opened by tapping the
-    // notification (rather than just tapping the app icon to open it),
-    // this function will fire on the next tick after the app starts
-    // with the notification data.
-    this._notificationSubscription = Notifications.addListener(this._handleNotification);
-  }
-
-  _handleNotification = notification => {
-    // do whatever you want to do with the notification
-    console.log("Why no alert");
-    this.setState({notification: notification});
-    Alert.alert("Notification Alert!", "Shut up");
-  };
 
   sendPushNotification = async () => {
     console.log("Sending out push notifications to quiet roommates.");
