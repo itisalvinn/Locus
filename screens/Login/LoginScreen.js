@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, AsyncStorage, Alert, Image } from 'react-native';
+import { StyleSheet, Text, View, AsyncStorage, Alert, Image, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { authLogin, authWithGoogle} from "../../firebase";
 import { Input, Button } from 'react-native-ui-kitten';
+import Constants from 'expo-constants';
 
 class LoginScreen extends Component {
   state = {
@@ -50,48 +51,49 @@ class LoginScreen extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <View>
-        <Image
-          style={{width: 250, height: 147, marginTop: 100, backgroundColor: 'transparent'}}
-          source={require('../../assets/logo_2.png')}
-          />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <KeyboardAvoidingView style={styles.content} behavior="padding" enabled>
+            <View>
+              <Image
+                style={{width: 250, height: 147, marginTop: 100, backgroundColor: 'transparent'}}
+                source={require('../../assets/logo_2.png')}
+                />
+            </View>
+
+            <View style={styles.login}>
+              <Input
+                  placeholder="Email"
+                  autoCapitalize="none"
+                  value={this.state.email}
+                  onChangeText={this.handleChange('email')}
+                  keyboardType="email-address"
+                  style={styles.input}
+                />
+              <Input
+                placeholder="Password"
+                secureTextEntry={true}
+                value={this.state.password}
+                onChangeText={this.handleChange('password')}
+                style={styles.input}
+              />
+              <Button onPress={this.onLoginPress} style={styles.btn}>
+                Log In
+              </Button>
+
+              <Button onPress={this.signInWithGoogle} style={styles.btn}>
+                Sign in With Google
+              </Button>
+
+            </View>
+          </KeyboardAvoidingView>
+
+          <View style={styles.bottom}>
+            <Button onPress={() => this.props.navigation.navigate('SignUpScreen')} appearance='outline'>
+            Sign Up</Button>
+          </View>
         </View>
-        <View style={styles.login}>
-          <Input
-              placeholder="Email"
-              autoCapitalize="none"
-              value={this.state.email}
-              onChangeText={this.handleChange('email')}
-              keyboardType="email-address"
-              style={styles.input}
-            />
-            <Input
-              placeholder="Password"
-              secureTextEntry={true}
-              value={this.state.password}
-              onChangeText={this.handleChange('password')}
-              style={styles.input}
-            />
-          <Button onPress={this.onLoginPress}>
-            Log In
-          </Button>
-
-          <Text></Text>
-
-          <Button onPress={this.signInWithGoogle}>
-            Sign in With Google
-          </Button>
-
-        </View>
-
-        <View style = {styles.bottom}>
-          <Button onPress={() => this.props.navigation.navigate('SignUpScreen')}>
-            Sign Up
-          </Button>
-        </View>
-
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -102,7 +104,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: Constants.statusBarHeight,
+  },
+  content: {
+    justifyContent: 'center',
+    height: "80%",
+    position: "absolute",
+    display: "flex",
+    width: "100%",
     alignItems: 'center',
+    zIndex: 10,
   },
   login: {
     flex: 6,
@@ -118,8 +129,14 @@ const styles = StyleSheet.create({
     // marginBottom: 2,
   },
   bottom: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    marginBottom: 20
+    marginVertical: 20,
+    position: 'absolute',
+    bottom: 60,
+    left: 40,
+    right: 40,
+    zIndex: 11,
+  },
+  btn: {
+    marginBottom: 10,
   }
 });

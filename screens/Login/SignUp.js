@@ -1,9 +1,9 @@
 import React from 'react'
-import {StyleSheet, Text, TextInput, View, Button, Alert, AsyncStorage} from 'react-native'
+import {StyleSheet, TextInput, View, Alert, AsyncStorage, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard} from 'react-native'
 import {authSignUp} from "../../firebase";
-import {Input} from 'react-native-ui-kitten';
+import {Input, Button, Text} from 'react-native-ui-kitten';
 import registerForPushNotificationsAsync from "../QuietHours/NotificationRegistration";
-
+import Constants from 'expo-constants';
 
 export default class SignUp extends React.Component {
   state = {
@@ -42,8 +42,10 @@ export default class SignUp extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Sign Up</Text>
+<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.content} behavior="padding" enabled>
+        <Text category='h3' style={styles.text}>Sign Up</Text>
         {this.state.errorMessage &&
         <Text style={{color: 'red'}}>
           {this.state.errorMessage}
@@ -82,22 +84,34 @@ export default class SignUp extends React.Component {
           value={this.state.password}
         />
 
-        <Button title="Submit Sign Up" onPress={this.handleSignUp}/>
+        <Button onPress={this.handleSignUp} style={styles.btn}>Sign Up</Button>
 
-        <Button
-          title="Already have an account? Login"
-          style={styles.bottom}
-          onPress={() => this.props.navigation.navigate('LoginScreen')}
-        />
-      </View>
+        </KeyboardAvoidingView>
+          <View style={styles.bottom}>
+            <Button
+              appearance='outline'
+              style={styles.bottom}
+              onPress={() => this.props.navigation.navigate('LoginScreen')}
+            >Already have an account? Login</Button>
+          </View>
+        </View>
+        </TouchableWithoutFeedback>
     )
   }
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: Constants.statusBarHeight,
+  },
+  content: {
     justifyContent: 'center',
-    alignItems: 'center'
+    height: "100%",
+    position: "absolute",
+    display: "flex",
+    width: "100%",
+    alignItems: 'center',
+    zIndex: 10,
   },
   textInput: {
     // height: 40,
@@ -107,8 +121,17 @@ const styles = StyleSheet.create({
     marginTop: 8
   },
   bottom: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    marginBottom: 20
+    marginVertical: 20,
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    zIndex: 11,
+  },
+  text: {
+    marginBottom: 20,
+  },
+  btn: {
+    width: "80%",
   }
 })
