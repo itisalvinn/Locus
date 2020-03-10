@@ -1,5 +1,15 @@
 import React, {Component} from 'react';
-import {Button, StyleSheet, Text, View, AsyncStorage, ActivityIndicator, Platform} from 'react-native';
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  AsyncStorage,
+  ActivityIndicator,
+  Platform,
+  Alert,
+  Vibration
+} from 'react-native';
 import {BottomNavigation, BottomNavigationTab} from 'react-native-ui-kitten';
 import TodoList from './TodoList/TodoList';
 import House from './House/House';
@@ -9,6 +19,8 @@ import Grocery from './Grocery/Grocery';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import {authDetect, base, authSignOut} from '../firebase';
 import Join from './House/Join';
+import {Notifications} from "expo";
+import registerForPushNotificationsAsync from './QuietHours/NotificationRegistration'
 
 class DashboardScreen extends Component {
   constructor(props) {
@@ -29,6 +41,8 @@ class DashboardScreen extends Component {
   }
 
   componentDidMount() {
+    registerForPushNotificationsAsync(this.state.uid);
+
     if (this.state.uid) {
       this.synchronizeStatesWithFirebase(this.state.uid);
     }
@@ -37,7 +51,30 @@ class DashboardScreen extends Component {
     } else {
       this.showInviteScreen();
     }
+
+    // Handle notifications that are received or selected while the app
+    // is open. If the app was closed and then opened by tapping the
+    // notification (rather than just tapping the app icon to open it),
+    // this function will fire on the next tick after the app starts
+    // with the notification data.
+    this._notificationSubscription = Notifications.addListener(this._handleNotification);
   }
+
+  _handleNotification = notification => {
+    console.log('Received a notification...');
+    console.log(notification);
+
+    // If they user hits the notification from notification tray
+    if (notification.origin == 'selected') {
+      // Navigate to quiet hours page
+      this.setState({selectedIndex: 3})
+    }
+    // When the user has app opened
+    if (notification.origin == 'received') {
+      Vibration.vibrate();
+      Alert.alert("Notification Alert!", "Shut up");
+    }
+  };
 
   shouldComponentUpdate(nextProps, nextState) {
     if (this.state.uid !== nextState.uid) {
@@ -123,10 +160,10 @@ class DashboardScreen extends Component {
   }
   generateUIDWithCollisionChecking = (obj) => {
     while (true) {
-        var uid = ("0000" + ((Math.random() * Math.pow(36, 6)) | 0).toString(36)).slice(-6);
-        if (!obj.hasOwnProperty(uid)) {
-            return uid;
-        }
+      var uid = ("0000" + ((Math.random() * Math.pow(36, 6)) | 0).toString(36)).slice(-6);
+      if (!obj.hasOwnProperty(uid)) {
+        return uid;
+      }
     }
   }
   createInviteCode = (houseUuid) => {
@@ -144,11 +181,11 @@ class DashboardScreen extends Component {
   }
   getInviteCode = (houseUuid) => {
     const {inviteCodes, houseInfo} = this.state;
-      for (let inviteCode in inviteCodes) {
-        if (inviteCodes[inviteCode] === houseUuid) {
-          console.log({inviteCode});
-          return inviteCode;
-        }
+    for (let inviteCode in inviteCodes) {
+      if (inviteCodes[inviteCode] === houseUuid) {
+        console.log({inviteCode});
+        return inviteCode;
+      }
     }
     console.log("Returning null invite code");
     return null;
@@ -168,7 +205,7 @@ class DashboardScreen extends Component {
     })
   }
   createNewHouse = () => {
-    const { houses } = this.state;
+    const {houses} = this.state;
     const houseUuid = this.generateUIDWithCollisionChecking(houses);
     this.createInviteCode(houseUuid);
     return houseUuid;
@@ -666,36 +703,36 @@ class DashboardScreen extends Component {
 
     return (
       <View style={styles.container}>
-      <View style={styles.content}>
-        {this.renderSelectedPage()}
-      </View>
-      {!Boolean(this.state.houseUuid) ? (
-        <View style={styles.bottomNav} key='noHouseBottomNav'>
-        <BottomNavigation
-          selectedIndex={this.state.selectedIndex}
-          onSelect={this.onSelect}>
-          <BottomNavigationTab icon={HomeIcon} key='1'/>
-          <BottomNavigationTab icon={ToDoIcon} key='2'/>
-          <BottomNavigationTab icon={SettingsIcon} key='3'/>
-          {/* Below is temporary */}
-          {/* <BottomNavigationTab title='Logout'/> */}
-        </BottomNavigation>
-      </View>
-      ) : (
-        <View style={styles.bottomNav} key='bottomNav'>
-          <BottomNavigation
-            selectedIndex={this.state.selectedIndex}
-            onSelect={this.onSelect}>
-            <BottomNavigationTab icon={HomeIcon}/>
-            <BottomNavigationTab icon={ToDoIcon}/>
-            <BottomNavigationTab icon={GroceryIcon}/>
-            <BottomNavigationTab icon={QuietHrsIcon}/>
-            <BottomNavigationTab icon={SettingsIcon}/>
-            {/* Below is temporary */}
-            {/* <BottomNavigationTab title='Logout'/> */}
-          </BottomNavigation>
+        <View style={styles.content}>
+          {this.renderSelectedPage()}
         </View>
-      )}
+        {!Boolean(this.state.houseUuid) ? (
+          <View style={styles.bottomNav} key='noHouseBottomNav'>
+            <BottomNavigation
+              selectedIndex={this.state.selectedIndex}
+              onSelect={this.onSelect}>
+              <BottomNavigationTab icon={HomeIcon} />
+              <BottomNavigationTab icon={ToDoIcon} />
+              <BottomNavigationTab icon={SettingsIcon} />
+              {/* Below is temporary */}
+              {/* <BottomNavigationTab title='Logout'/> */}
+            </BottomNavigation>
+          </View>
+        ) : (
+          <View style={styles.bottomNav} key='bottomNav'>
+            <BottomNavigation
+              selectedIndex={this.state.selectedIndex}
+              onSelect={this.onSelect}>
+              <BottomNavigationTab icon={HomeIcon} />
+              <BottomNavigationTab icon={ToDoIcon} />
+              <BottomNavigationTab icon={GroceryIcon} />
+              <BottomNavigationTab icon={QuietHrsIcon} />
+              <BottomNavigationTab icon={SettingsIcon} />
+              {/* Below is temporary */}
+              {/* <BottomNavigationTab title='Logout'/> */}
+            </BottomNavigation>
+          </View>
+        )}
       </View>
     )
   }

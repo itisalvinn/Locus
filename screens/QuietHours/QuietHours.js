@@ -1,14 +1,57 @@
 import * as React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Layout, Text} from 'react-native-ui-kitten';
+import {Alert, StyleSheet, View} from 'react-native';
+import {Button, Layout, Text} from 'react-native-ui-kitten';
 import TimePickerModal from './TimePickerModal';
 import Constants from 'expo-constants';
+import {Notifications} from 'expo';
+import * as firebase from "firebase";
+import { Vibration } from "react-native";
 
 export default class TodoList extends React.Component {
   state = {
     addClicked: false,
     editClicked: false,
     editItemKey: null
+  }
+
+  sendPushNotification = async () => {
+    console.log("Sending out push notifications to quiet roommates.");
+
+    let recipients = [];
+
+    for (const [key] of Object.entries(this.props.houseInfo.members)) {
+      if (key == this.props.uid) {
+        //Don't send notification to current user
+        continue;
+      }
+
+      // Otherwise add all relevant house members notification token to
+      // JSON Body so we can do a batch request to expo notification service
+      await firebase
+        .database()
+        .ref(`users/${key}/notification_token`)
+        .once('value', function (snapshot) {
+          const notificationToken = snapshot.val()
+          console.log(`User: ${key} | Token: ${notificationToken}`)
+          recipients.push(notificationToken)
+        });
+    }
+
+    console.log("Recipients: ", recipients)
+
+    let response = fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: recipients,
+        sound: 'default',
+        title: 'Quiet Hours Alert!',
+        body: 'Someone would like you to stop screeching like a banshee'
+      })
+    })
   }
 
   renderTimePicker(timeSelector, edit) {
@@ -95,6 +138,14 @@ export default class TodoList extends React.Component {
 
     return (
       <View style={styles.container}>
+        {this.props.houseInfo &&
+        <Button
+          status={'danger'}
+          onPress={this.sendPushNotification}
+        >
+          Shut up hoe
+        </Button>
+        }
         <Text style={styles.text} category='h5'>
           Roommate Quiet Hours
         </Text>
@@ -109,8 +160,8 @@ export default class TodoList extends React.Component {
                   <Text numberOfLines={1} style={styles.memberText}> {members[entry[0]]}</Text>
                 </View>
                 <View style={styles.verticalStack}>
-                  <Text > Weekday: {entry[1].weekday}</Text>
-                  <Text > Weekend: {entry[1].weekend}</Text>
+                  <Text>Weekday: {entry[1].weekday}</Text>
+                  <Text>Weekend: {entry[1].weekend}</Text>
                 </View>
               </View>
             );
@@ -121,7 +172,6 @@ export default class TodoList extends React.Component {
   }
 
   render() {
-    console.log(this.props.houseInfo);
     return (
       <Layout style={styles.container}>
         <Layout style={styles.header}>
