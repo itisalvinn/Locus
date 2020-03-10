@@ -1,14 +1,56 @@
 import * as React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Layout, Text} from 'react-native-ui-kitten';
+import {Alert, StyleSheet, View} from 'react-native';
+import {Button, Layout, Text} from 'react-native-ui-kitten';
 import TimePickerModal from './TimePickerModal';
 import Constants from 'expo-constants';
+import registerForPushNotificationsAsync from './SilenceYourselfThot'
+import {Notifications} from 'expo';
 
 export default class TodoList extends React.Component {
   state = {
     addClicked: false,
     editClicked: false,
-    editItemKey: null
+    editItemKey: null,
+    notifications: {}
+  }
+
+  componentDidMount() {
+    console.log("Trying to register for notifications");
+    registerForPushNotificationsAsync(this.props.uid);
+    console.log("After register");
+
+    // Handle notifications that are received or selected while the app
+    // is open. If the app was closed and then opened by tapping the
+    // notification (rather than just tapping the app icon to open it),
+    // this function will fire on the next tick after the app starts
+    // with the notification data.
+    this._notificationSubscription = Notifications.addListener(this._handleNotification);
+  }
+
+  _handleNotification = notification => {
+    // do whatever you want to do with the notification
+    this.setState({notification: notification});
+    Alert.alert("Notification Alert!", "Shut up");
+  };
+
+  sendPushNotification = () => {
+    // I got the user that we will send the push notification to from the database and set it to state, now I have access to the users push token.
+    // const userExpoToken = this.state.user.expoToken
+    console.log("Sending out push notifications");
+    // Now we will send the message to the expo servers
+    let response = fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: "ExponentPushToken[orA29iDgON2JJGqUvt27Dr]",
+        sound: 'default',
+        title: 'Quiet Hours Alert!',
+        body: 'Someone would like you to screeching like a banshee'
+      })
+    })
   }
 
   renderTimePicker(timeSelector, edit) {
@@ -95,6 +137,12 @@ export default class TodoList extends React.Component {
 
     return (
       <View style={styles.container}>
+        <Button
+          status={'danger'}
+          onPress={this.sendPushNotification}
+        >
+          Shut up hoe
+        </Button>
         <Text style={styles.text} category='h5'>
           Roommate Quiet Hours
         </Text>
@@ -109,8 +157,8 @@ export default class TodoList extends React.Component {
                   <Text numberOfLines={1} style={styles.memberText}> {members[entry[0]]}</Text>
                 </View>
                 <View style={styles.verticalStack}>
-                  <Text > Weekday: {entry[1].weekday}</Text>
-                  <Text > Weekend: {entry[1].weekend}</Text>
+                  <Text>Weekday: {entry[1].weekday}</Text>
+                  <Text>Weekend: {entry[1].weekend}</Text>
                 </View>
               </View>
             );

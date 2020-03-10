@@ -22,7 +22,8 @@
     "react-native-svg": "9.13.3",
     "react-native-ui-kitten": "^4.1.0",
     "react-native-web": "^0.11.7",
-    "react-navigation": "^3.11.0"
+    "react-navigation": "^3.11.0",
+    "expo-permissions": "latest"
   },
   "devDependencies": {
     "babel-preset-expo": "^8.0.0",

@@ -24,7 +24,8 @@ export default class SignUp extends React.Component {
       this.state.lastName,
       this.state.password,
       () => { this.props.navigation.navigate('LoadingScreen') },
-      () => {
+      (err) => {
+        console.log(err)
         this.setState({
           errorMessage: "Sign up didn't work..."
         })
