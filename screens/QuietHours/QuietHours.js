@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
+import {Alert, StyleSheet, View, ScrollView} from 'react-native';
 import {Button, Layout, Text} from 'react-native-ui-kitten';
 import TimePickerModal from './TimePickerModal';
 import Constants from 'expo-constants';
@@ -139,14 +139,6 @@ export default class TodoList extends React.Component {
 
     return (
       <View style={styles.container}>
-        {this.props.houseInfo &&
-        <Button
-          status={'danger'}
-          onPress={this.sendPushNotification}
-        >
-          Shut up hoe
-        </Button>
-        }
         <Text style={styles.text} category='h5'>
           Roommate Quiet Hours
         </Text>
@@ -172,11 +164,25 @@ export default class TodoList extends React.Component {
     );
   }
 
+  renderShutUp() {
+    return(
+        <Button
+          title="Shut up"
+          status={'danger'}
+          onPress={this.sendPushNotification}
+          style={styles.shutUp}
+        >
+          Be Quiet!
+        </Button>
+    );
+  }
+
   render() {
     return (
       <Layout style={styles.container}>
         <Layout style={styles.header}>
           <Text style={styles.headerText} category='h5'>Quiet Hours</Text>
+          {this.renderShutUp()}
         </Layout>
         <Toast ref="toast" duration={DURATION.LENGTH_SHORT}/>
         {this.renderUserQuietHours()}
@@ -210,8 +216,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     padding: 20,
-    // flex: 1,
-    flexDirection: 'row',
+    flex: 1,
     color: 'white',
   },
   header: {
@@ -240,5 +245,10 @@ const styles = StyleSheet.create({
   verticalStack: {
     flexDirection: 'column',
     alignSelf: 'flex-end',
+  },
+  shutUp: {
+    position: 'relative',
+    marginTop: 2,
+    right: 10,
   }
 });
