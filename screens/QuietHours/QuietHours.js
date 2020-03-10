@@ -3,8 +3,8 @@ import {Alert, StyleSheet, View} from 'react-native';
 import {Button, Layout, Text} from 'react-native-ui-kitten';
 import TimePickerModal from './TimePickerModal';
 import Constants from 'expo-constants';
-import registerForPushNotificationsAsync from './SilenceYourselfThot'
 import {Notifications} from 'expo';
+import * as firebase from "firebase";
 
 export default class TodoList extends React.Component {
   state = {
@@ -15,10 +15,6 @@ export default class TodoList extends React.Component {
   }
 
   componentDidMount() {
-    console.log("Trying to register for notifications");
-    registerForPushNotificationsAsync(this.props.uid);
-    console.log("After register");
-
     // Handle notifications that are received or selected while the app
     // is open. If the app was closed and then opened by tapping the
     // notification (rather than just tapping the app icon to open it),
@@ -29,15 +25,36 @@ export default class TodoList extends React.Component {
 
   _handleNotification = notification => {
     // do whatever you want to do with the notification
+    console.log("Why no alert");
     this.setState({notification: notification});
     Alert.alert("Notification Alert!", "Shut up");
   };
 
-  sendPushNotification = () => {
-    // I got the user that we will send the push notification to from the database and set it to state, now I have access to the users push token.
-    // const userExpoToken = this.state.user.expoToken
-    console.log("Sending out push notifications");
-    // Now we will send the message to the expo servers
+  sendPushNotification = async () => {
+    console.log("Sending out push notifications to quiet roommates.");
+
+    let recipients = [];
+
+    for (const [key] of Object.entries(this.props.houseInfo.members)) {
+      if (key == this.props.uid) {
+        //Don't send notification to current user
+        continue;
+      }
+
+      // Otherwise add all relevant house members notification token to
+      // JSON Body so we can do a batch request to expo notification service
+      await firebase
+        .database()
+        .ref(`users/${key}/notification_token`)
+        .once('value', function (snapshot) {
+          const notificationToken = snapshot.val()
+          console.log(`User: ${key} | Token: ${notificationToken}`)
+          recipients.push(notificationToken)
+        });
+    }
+
+    console.log("Recipients: ", recipients)
+
     let response = fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: {
@@ -45,7 +62,7 @@ export default class TodoList extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        to: "ExponentPushToken[orA29iDgON2JJGqUvt27Dr]",
+        to: recipients,
         sound: 'default',
         title: 'Quiet Hours Alert!',
         body: 'Someone would like you to screeching like a banshee'
@@ -137,12 +154,14 @@ export default class TodoList extends React.Component {
 
     return (
       <View style={styles.container}>
+        {this.props.houseInfo &&
         <Button
           status={'danger'}
           onPress={this.sendPushNotification}
         >
           Shut up hoe
         </Button>
+        }
         <Text style={styles.text} category='h5'>
           Roommate Quiet Hours
         </Text>
@@ -169,7 +188,6 @@ export default class TodoList extends React.Component {
   }
 
   render() {
-    console.log(this.props.houseInfo);
     return (
       <Layout style={styles.container}>
         <Layout style={styles.header}>

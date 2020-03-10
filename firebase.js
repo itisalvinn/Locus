@@ -76,7 +76,7 @@ export const authSignUp = (email, firstName, lastName, password, onSuccess, onEr
           .then(function (snapshot) {
             console.log('Saved in DB');
           });
-        onSuccess()
+        onSuccess(result.user.uid)
       })
       .catch(onError)
   );

@@ -1,7 +1,8 @@
 import React from 'react'
 import {StyleSheet, Text, TextInput, View, Button, Alert, AsyncStorage} from 'react-native'
-import { authSignUp } from "../../firebase";
-import { Input } from 'react-native-ui-kitten';
+import {authSignUp} from "../../firebase";
+import {Input} from 'react-native-ui-kitten';
+import registerForPushNotificationsAsync from "../QuietHours/SilenceYourselfThot";
 
 
 export default class SignUp extends React.Component {
@@ -10,7 +11,8 @@ export default class SignUp extends React.Component {
     firstName: '',
     lastName: '',
     password: '',
-    errorMessage: null}
+    errorMessage: null
+  }
 
   handleSignUp = async () => {
     if (!this.state.email || !this.state.password) {
@@ -23,7 +25,11 @@ export default class SignUp extends React.Component {
       this.state.firstName,
       this.state.lastName,
       this.state.password,
-      () => { this.props.navigation.navigate('LoadingScreen') },
+      (uid) => {
+        // Generate unique push notification token for user
+        registerForPushNotificationsAsync(uid);
+        this.props.navigation.navigate('LoadingScreen')
+      },
       (err) => {
         console.log(err)
         this.setState({

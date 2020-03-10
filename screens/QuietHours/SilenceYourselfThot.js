@@ -17,9 +17,9 @@ export default async function registerForPushNotificationsAsync(userID) {
 
   // Get the token that identifies this device
   let token = await Notifications.getExpoPushTokenAsync();
-  console.log("Token for this device is: ", token)
+  console.log("Push notification token for this device: ", token)
 
-  const dataRef = 'users/' + userID;
+  const dataRef = 'users/' + userID + '/notification_token';
 
   firebase
     .database()
