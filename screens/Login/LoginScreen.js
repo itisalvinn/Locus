@@ -69,6 +69,8 @@ class LoginScreen extends Component {
                   onChangeText={this.handleChange('email')}
                   keyboardType="email-address"
                   style={styles.input}
+                  onSubmitEditing={() => { this.secondTextInput.focus(); }}
+                  blurOnSubmit={false}
                 />
               <Input
                 placeholder="Password"
@@ -76,6 +78,8 @@ class LoginScreen extends Component {
                 value={this.state.password}
                 onChangeText={this.handleChange('password')}
                 style={styles.input}
+                ref={(input) => { this.secondTextInput = input; }}
+                onSubmitEditing={this.onLoginPress}
               />
               <Button onPress={this.onLoginPress} style={styles.btn}>
                 Log In

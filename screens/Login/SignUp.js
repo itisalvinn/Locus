@@ -53,35 +53,46 @@ export default class SignUp extends React.Component {
 
         <Input
           placeholder="First Name"
-          autoCapitalize
+          autoCapitalize='words'
           style={styles.textInput}
           onChangeText={firstName => this.setState({firstName})}
           value={this.state.firstName}
+          onSubmitEditing={() => { this.secondTextInput.focus(); }}
+          blurOnSubmit={false}
         />
 
         <Input
+          ref={(input) => { this.secondTextInput = input; }}
           placeholder="Last Name"
-          autoCapitalize
+          autoCapitalize='words'
           style={styles.textInput}
           onChangeText={lastName => this.setState({lastName})}
           value={this.state.lastName}
+          onSubmitEditing={() => { this.thirdTextInput.focus(); }}
+          blurOnSubmit={false}
         />
 
         <Input
+          ref={(input) => { this.thirdTextInput = input; }}
           placeholder="Email"
           autoCapitalize="none"
           style={styles.textInput}
+          keyboardType="email-address"
           onChangeText={email => this.setState({email})}
           value={this.state.email}
+          onSubmitEditing={() => { this.fourthTextInput.focus(); }}
+          blurOnSubmit={false}
         />
 
         <Input
+          ref={(input) => { this.fourthTextInput = input; }}
           secureTextEntry
           placeholder="Password"
           autoCapitalize="none"
           style={styles.textInput}
           onChangeText={password => this.setState({password})}
           value={this.state.password}
+          onSubmitEditing={this.handleSignUp}
         />
 
         <Button onPress={this.handleSignUp} style={styles.btn}>Sign Up</Button>
