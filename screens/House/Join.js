@@ -75,11 +75,11 @@ export default class Join extends React.Component {
     return (
 <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <Layout style={styles.container}>
+    <KeyboardAvoidingView style={styles.content} behavior="padding" enabled>
         <Layout style={styles.header}>
           <Text style={styles.text} category='h2'>{shouldCreateHouse ? "Create a House" : "Join a House"}</Text>
           </Layout>
 
-    <KeyboardAvoidingView style={styles.content} behavior="padding" enabled>
         {/* <View style={styles.content}> */}
             <Text style={styles.text}>
               {shouldCreateHouse ? "Please input a house name to create a house:" : "You're currently not in any house! To join a house, please input an invite code below:"}
@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
   text: {
     padding: 20,
     paddingBottom: 0,
-    marginTop: 20,
   },
   input: {
     margin: 20,
