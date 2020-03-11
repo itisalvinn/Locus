@@ -294,13 +294,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    paddingTop: 25,
+    paddingTop: Constants.statusBarHeight,
     backgroundColor: 'black',
   },
   toggleBtn: {
     position: 'relative',
     marginTop: 2,
     right: 10,
-    width: 160
+    paddingHorizontal: 10,
   }
 });

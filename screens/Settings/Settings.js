@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    paddingTop: 25,
+    paddingTop: Constants.statusBarHeight,
     backgroundColor: 'black',
   },
   logoutBtn: {
