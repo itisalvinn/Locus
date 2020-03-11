@@ -92,6 +92,7 @@ export default class Join extends React.Component {
                 label='House Name'
                 onChangeText={this.onHouseNameChange}
                 caption={invalidHouseNameError ? 'Invalid House Name Length' : null}
+                autoCapitalize="none"
               />
             ) : (
               <Input
@@ -101,6 +102,7 @@ export default class Join extends React.Component {
                 label='Invite Code'
                 onChangeText={this.onInviteCodeChange}
                 caption={invalidCodeError ? 'Invalid Invite Code' : null}
+                autoCapitalize="none"
               />
             )}
             
