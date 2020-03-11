@@ -11,7 +11,7 @@ import SignUp from './screens/Login/SignUp';
 
 export default class App extends Component {
   componentDidMount() {
-    StatusBar.setBarStyle('dark-content', true);
+    StatusBar.setBarStyle('light-content', true);
   }
   render() {
     return (

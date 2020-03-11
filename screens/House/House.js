@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Toast, {DURATION} from 'react-native-easy-toast';
-import { StyleSheet, View, Clipboard, TouchableOpacity, ScrollView, SafeAreaView} from 'react-native';
-import { Layout, Text, Button, Input, Modal} from 'react-native-ui-kitten';
+import {StyleSheet, View, Clipboard, TouchableOpacity, ScrollView, SafeAreaView} from 'react-native';
+import {Layout, Text, Button, Input, Modal} from 'react-native-ui-kitten';
 import Card from './Card';
 import EditModal from '../TodoList/EditModal';
 import Constants from 'expo-constants';
@@ -77,7 +77,7 @@ export default class House extends React.Component {
       this.props.joinHouseFromInvite(inviteCode);
     } else {
       // Invalid code
-    this.refs.toast.show('Invalid Code');
+      this.refs.toast.show('Invalid Code');
     }
     this.hideJoinModal();
   }
@@ -128,7 +128,8 @@ export default class House extends React.Component {
           return (
             <TouchableOpacity key={houseUuid} onPress={() => this.props.editHouse(houseUuid)}>
               <Layout level='2' style={styles.otherHouseWrapper}>
-                <Text style={styles.otherHouseName} category='s1'>Switch to house: {houses[houseUuid] && houses[houseUuid].name || houseUuid}
+                <Text style={styles.otherHouseName} category='s1'>Switch to
+                  house: {houses[houseUuid] && houses[houseUuid].name || houseUuid}
                 </Text>
               </Layout>
             </TouchableOpacity>
@@ -140,117 +141,124 @@ export default class House extends React.Component {
 
   render() {
     const {shouldShowInvite, shouldShowCreate, shouldShowLeaveHouse, showLeaveBtn, shouldShowJoin} = this.state;
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <Layout level='1' style={styles.content}>
-      <Layout level='1' style={styles.header}>
-        <Text style={styles.text} category='h3'>Hi, {this.props.user && this.props.user.first_name}</Text>
-      </Layout>
+    return (
+      <View style={styles.container}>
 
-      {this.props.houseInfo ? (
-          <View style={styles.cardWrapper}>
-            <View style={styles.currentHouseHeader}>
-              <Text category='h5' style={styles.currentHouseName}>{this.props.houseInfo.name}</Text>
-              <Button onPress={this.showInviteModal} appearance='outline'>Invite Code</Button>
+        <Layout level='1' style={styles.header}>
+          <Text style={styles.headerText} category='h5'>Hi, {this.props.user && this.props.user.first_name}</Text>
+        </Layout>
+
+        <ScrollView style={styles.houseInfo}>
+          {this.props.houseInfo ? (
+            <View style={styles.cardWrapper}>
+              <View style={styles.currentHouseHeader}>
+                <Text category='h5' style={styles.currentHouseName}>{this.props.houseInfo.name}</Text>
+                <Button onPress={this.showInviteModal} appearance='outline'>Invite Code</Button>
+              </View>
+              <Card houseInfo={this.props.houseInfo} onCardPress={this.onCardPress}
+                    resetCardPress={this.hideCardLeaveBtn}/>
+
+              {showLeaveBtn ? (
+                <Button style={styles.leaveBtn} status='danger' onPress={this.showLeaveModal}>Leave</Button>
+              ) : null}
             </View>
-            <Card houseInfo={this.props.houseInfo} onCardPress={this.onCardPress} resetCardPress={this.hideCardLeaveBtn} />
-
-          {showLeaveBtn ? (
-            <Button style={styles.leaveBtn} status='danger' onPress={this.showLeaveModal}>Leave</Button>
           ) : null}
+
+          {this.renderHouseNames()}
+        </ScrollView>
+
+
+        {shouldShowCreate || shouldShowInvite || shouldShowLeaveHouse || shouldShowJoin ? (
+          <Layout level='2' style={styles.overlay}/>
+        ) : null}
+
+        {shouldShowInvite ? (
+          <View style={styles.editModalContainer}>
+            <EditModal
+              title={'Invite Code'}
+              btnText={'Copy Code'}
+              onClose={this.hideInviteModal}
+              onSubmit={this.copyInviteCode}
+              text={this.props.getInviteCode(this.props.houseUuid)}
+              autoFocus={false}
+              placeholder='Invite code...'
+              clearOnSubmit={false}
+              disabled={true}
+              style={{...styles.editModal, ...styles.editInviteModal}}/>
           </View>
-      ) : null}
+        ) : null}
 
-      {this.renderHouseNames()}
-      </Layout>
-      </ScrollView>
-
-      {shouldShowCreate || shouldShowInvite || shouldShowLeaveHouse || shouldShowJoin ? (
-        <Layout level='2' style={styles.overlay} />
-      ) : null}
-
-      {shouldShowInvite ? (
-        <View style={styles.editModalContainer}>
-          <EditModal
-            title={'Invite Code'}
-            btnText={'Copy Code'}
-            onClose={this.hideInviteModal}
-            onSubmit={this.copyInviteCode}
-            text={this.props.getInviteCode(this.props.houseUuid)}
-            autoFocus={false}
-            placeholder='Invite code...'
-            clearOnSubmit={false}
-            disabled={true}
-            style={{...styles.editModal, ...styles.editInviteModal}} />
+        {shouldShowCreate ? (
+          <View style={styles.editModalContainer}>
+            <EditModal
+              title={'Create House'}
+              btnText={'Create House'}
+              onClose={this.hideCreateModal}
+              onSubmit={this.createNewHouse}
+              placeholder='Name...'/>
           </View>
-      ) : null}
+        ) : null}
 
-      {shouldShowCreate ? (
-        <View style={styles.editModalContainer}>
-          <EditModal
-            title={'Create House'}
-            btnText={'Create House'}
-            onClose={this.hideCreateModal}
-            onSubmit={this.createNewHouse}
-            placeholder='Name...' />
+        {shouldShowJoin ? (
+          <View style={styles.editModalContainer}>
+            <EditModal
+              title={'Join House'}
+              btnText={'Join House'}
+              onClose={this.hideJoinModal}
+              onSubmit={this.joinHouse}
+              placeholder='Invite code...'/>
           </View>
-      ) : null}
+        ) : null}
 
-      {shouldShowJoin ? (
-        <View style={styles.editModalContainer}>
-          <EditModal
-            title={'Join House'}
-            btnText={'Join House'}
-            onClose={this.hideJoinModal}
-            onSubmit={this.joinHouse}
-            placeholder='Invite code...' />
-          </View>
-      ) : null}
-
-      <Modal visible={shouldShowLeaveHouse} allowBackdrop={true}>
-        <Layout
-          level='2'
-          style={styles.modalContainer}>
-            <Text category='s1'>Are you sure you want to leave <Text status='primary'>{this.props.houseInfo ? this.props.houseInfo.name : ''}?</Text></Text>
-              <Layout style={styles.btnContainer} level='2'>
-            <Button status='danger' onPress={this.hideLeaveModal} style={styles.leftBtn}>
-              Cancel
-            </Button>
-            <Button onPress={this.leaveHouse} appearance='outline' style={styles.rightBtn}>
-              Leave House
-            </Button>
+        <Modal visible={shouldShowLeaveHouse} allowBackdrop={true}>
+          <Layout
+            level='2'
+            style={styles.modalContainer}>
+            <Text category='s1'>Are you sure you want to leave <Text
+              status='primary'>{this.props.houseInfo ? this.props.houseInfo.name : ''}?</Text></Text>
+            <Layout style={styles.btnContainer} level='2'>
+              <Button status='danger' onPress={this.hideLeaveModal} style={styles.leftBtn}>
+                Cancel
+              </Button>
+              <Button onPress={this.leaveHouse} appearance='outline' style={styles.rightBtn}>
+                Leave House
+              </Button>
+            </Layout>
           </Layout>
-          </Layout>
-      </Modal>
+        </Modal>
 
-      <Toast ref="toast" duration={DURATION.LENGTH_SHORT}/>
+        <Toast ref="toast" duration={DURATION.LENGTH_SHORT}/>
 
-      <Layout level='3' style={{...styles.createBtnWrapper, ...styles.createBtnBackdrop}} />
-      <View style={styles.createBtnWrapper}>
-        <Button onPress={this.showJoinModal} style={styles.leftBtn}>Join</Button>
-        <Button onPress={this.showCreateModal} style={styles.rightBtn}>Create</Button>
+        <Layout level='3' style={{...styles.createBtnWrapper, ...styles.createBtnBackdrop}}/>
+        <View style={styles.createBtnWrapper}>
+          <Button onPress={this.showJoinModal} style={styles.leftBtn}>Join</Button>
+          <Button onPress={this.showCreateModal} style={styles.rightBtn}>Create</Button>
+        </View>
       </View>
-    </SafeAreaView>
-  );
+    )
+      ;
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Constants.statusBarHeight,
+    position: 'relative'
   },
   header: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     paddingTop: 10,
+    backgroundColor: 'black',
   },
-  text: {
+  headerText: {
     padding: 20,
-    marginTop: 20,
-    flex: 1,
+    flexDirection: 'row',
+    color: 'white',
+  },
+  houseInfo: {
+    paddingTop: 20
   },
   cardWrapper: {
     marginLeft: 20,
@@ -270,7 +278,7 @@ const styles = StyleSheet.create({
     borderColor: "#eee",
     borderRadius: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
@@ -302,6 +310,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: 85,
+    backgroundColor: 'white'
   },
   createBtnBackdrop: {
     opacity: 0.3,
@@ -319,7 +328,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
@@ -358,7 +367,7 @@ const styles = StyleSheet.create({
     borderColor: "#eee",
     borderWidth: 1,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,

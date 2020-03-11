@@ -209,8 +209,7 @@ const styles = StyleSheet.create({
   container: {
     // height: '100%',
     flex: 1,
-    position: 'relative',
-    paddingTop: Constants.statusBarHeight,
+    position: 'relative'
   },
   content: {
     flex: 1,
