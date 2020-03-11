@@ -72,7 +72,7 @@ class DashboardScreen extends Component {
     // When the user has app opened
     if (notification.origin == 'received') {
       Vibration.vibrate();
-      Alert.alert("Notification Alert!", "Please keep it down (mbule gojën).");
+      Alert.alert("Locus Alert (闭嘴)", "Please keep it down (mbule gojën).");
     }
   };
 
