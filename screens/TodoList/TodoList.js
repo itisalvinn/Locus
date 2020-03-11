@@ -157,9 +157,9 @@ export default class TodoList extends React.Component {
     <Layout style={styles.container}>
       <Layout style={styles.header}>
         <Text style={styles.text} category='h5'>Todo List</Text>
-        <Button appearance='ghost' onPress={showCompleted ? this.onActivePress : this.onCompletePress}>{showCompleted ? "Active" : "Completed"}</Button>
+        <Button style={styles.toggleBtn} appearance='outline' status='control' onPress={showCompleted ? this.onActivePress : this.onCompletePress}>View {showCompleted ? "Active" : "Completed"}</Button>
         <View style={styles.editBtnWrapper}>
-          {/* <Button
+          {/* <control
           style={styles.editBtn}
           textStyle={styles.btnText}
           onPress={this.onEditPress}
@@ -297,4 +297,10 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     backgroundColor: 'black',
   },
+  toggleBtn: {
+    position: 'relative',
+    marginTop: 2,
+    right: 10,
+    width: 160
+  }
 });
