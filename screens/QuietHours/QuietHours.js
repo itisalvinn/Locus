@@ -167,7 +167,6 @@ export default class TodoList extends React.Component {
   renderShutUp() {
     return(
         <Button
-          title="Shut up"
           status={'danger'}
           onPress={this.sendPushNotification}
           style={styles.shutUp}
