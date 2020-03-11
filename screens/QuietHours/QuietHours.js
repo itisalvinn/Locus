@@ -47,8 +47,8 @@ export default class TodoList extends React.Component {
       body: JSON.stringify({
         to: recipients,
         sound: 'default',
-        title: 'Quiet Hours Alert!',
-        body: 'Someone would like you to stop screeching like a banshee'
+        title: 'Locus Alert (闭嘴)',
+        body: 'Your roommate would like you to keep it down.'
       })
     })
 
