@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: 25,
     backgroundColor: 'black',
   },
   memberName: {
