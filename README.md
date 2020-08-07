@@ -17,3 +17,4 @@ $ yarn install
 # Run on local host
 $ yarn start
 $ Scan QR code with Expo app 
+`
