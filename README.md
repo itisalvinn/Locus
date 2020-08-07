@@ -1,4 +1,4 @@
-# Locus - An app for roommates 
+# Locus
 
 Roommate app built using [React Native](https://reactnative.dev/) and [Firebase](https://firebase.google.com/).
 
