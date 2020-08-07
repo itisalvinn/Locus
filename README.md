@@ -1,8 +1,6 @@
 
 ![preview](https://github.com/itisalvinn/Locus/blob/master/assets/logo_2.png)
 
-# Locus
-
 Roommate app built using [React Native](https://reactnative.dev/) and [Firebase](https://firebase.google.com/).
 
 # Features
