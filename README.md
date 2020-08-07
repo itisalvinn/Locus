@@ -11,7 +11,8 @@ Roommate app built using [React Native](https://reactnative.dev/) and [Firebase]
 
 # Install and run
 
-```# Install packages
+```
+# Install packages
 $ yarn install
 
 # Run on local host
