@@ -1,7 +1,7 @@
 
 ![preview](https://github.com/itisalvinn/Locus/blob/master/assets/logo_2.png)
 
-Roommate app built using [React Native](https://reactnative.dev/) and [Firebase](https://firebase.google.com/).
+Roommate app built with [React Native](https://reactnative.dev/) and [Firebase](https://firebase.google.com/).
 
 # Features
 
